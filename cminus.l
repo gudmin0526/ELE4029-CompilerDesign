@@ -48,6 +48,7 @@ whitespace  [ \t]+
 "}"             {return RCURLY;}
 ";"             {return SEMI;}
 ","             {return COMMA;}
+
 "/*"            { char c;
                   do
                   { c = input();

@@ -44,16 +44,12 @@ int compare_files(const char *file1, const char *file2) {
     return 0;
 }
 
-int main() {
-    char file1[100], file2[100];
-
-    printf("첫 번째 파일 이름을 입력하세요: ");
-    scanf("%s", file1);
-
-    printf("두 번째 파일 이름을 입력하세요: ");
-    scanf("%s", file2);
-
-    compare_files(file1, file2);
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        printf("usage: %s <infile> <outfile>\n", argv[0]);
+        exit(1);
+    }
+    compare_files(argv[1], argv[2]);
 
     return 0;
 }
