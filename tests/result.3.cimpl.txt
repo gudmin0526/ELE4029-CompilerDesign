@@ -1,0 +1,3 @@
+
+C-MINUS COMPILATION: tests/test.3.txt
+	2: EOF

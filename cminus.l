@@ -1,6 +1,6 @@
 /****************************************************/
-/* File: tiny.l                                     */
-/* Lex specification for TINY                       */
+/* File: cminus.l                                   */
+/* Lex specification for C-MINUS                    */
 /* Compiler Construction: Principles and Practice   */
 /* Kenneth C. Louden                                */
 /****************************************************/
@@ -14,8 +14,8 @@ char tokenString[MAXTOKENLEN+1];
 %}
 
 digit       [0-9]
-number      {digit}+
 letter      [a-zA-Z]
+number      {digit}+
 identifier  {letter}({letter}|{digit})*
 newline     \n
 whitespace  [ \t]+
@@ -49,28 +49,22 @@ whitespace  [ \t]+
 ";"             {return SEMI;}
 ","             {return COMMA;}
 
-"/*"            { char c;
-                  do
-                  { c = input();
-                    if (c == '*') { 
-                      c = input();
-                      if (c == '/') break;
-                    }
-                    if (c == '\n')  lineno++;
-                  } while (1);
+"/*"            { char c; 
+                  char pc = '\0';
+                  while (1) 
+                  {
+                    c = input();
+                    if (c == EOF) break;
+                    if (c == '\n') lineno++;
+                    if (pc == '*' && c == '/') break;
+                    pc = c;
+                  }
                 }
 
 {number}        {return NUM;}
 {identifier}    {return ID;}
 {newline}       {lineno++;}
 {whitespace}    {/* skip whitespace */}
-"{"             { char c;
-                  do
-                  { c = input();
-                    if (c == EOF)  break;
-                    if (c == '\n') lineno++;
-                  } while (c != '}');
-                }
 .               {return ERROR;}
 
 %%
