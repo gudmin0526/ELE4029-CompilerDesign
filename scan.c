@@ -243,6 +243,8 @@ TokenType getToken(void) {
                     currentToken = ENDFILE;
                 } else if (c == '/')
                     state = START;
+                else if (c == '*')
+                    break;
                 else
                     state = INCOMMENT;
                 break;
