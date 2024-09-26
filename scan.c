@@ -119,6 +119,7 @@ TokenType getToken(void) {
                 else {
                     state = DONE;
                     switch (c) {
+                        case '\0':
                         case EOF:
                             save = FALSE;
                             currentToken = ENDFILE;
