@@ -67,7 +67,7 @@ echo "[TEST 9]"
 cases/diff_checker cases/result/result.9.lex.txt cases/result/result.9.cimpl.txt
 
 echo "[TEST A]"
-cases/diff_checkeer cases/answer/answer.1.txt cases/result/result.1.cimpl.txt
+cases/diff_checker cases/answer/answer.1.txt cases/result/result.1.cimpl.txt
 echo "[TEST B]"
 cases/diff_checker cases/answer/answer.2.txt cases/result/result.2.cimpl.txt
 

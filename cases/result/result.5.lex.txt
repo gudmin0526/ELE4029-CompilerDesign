@@ -1,3 +1,71 @@
 
 C-MINUS COMPILATION: cases/test/test.5.txt
-	1: EOF
+	12: reserved word: void
+	12: ID, name= Void
+	12: (
+	12: )
+	12: {
+	13: reserved word: int
+	13: ID, name= a
+	13: ,
+	13: ID, name= b
+	13: ,
+	13: ID, name= c
+	13: ;
+	14: ID, name= a
+	14: =
+	14: NUM, val= 8
+	14: ;
+	14: ID, name= b
+	14: =
+	14: NUM, val= 1
+	14: ;
+	14: ID, name= c
+	14: =
+	14: NUM, val= 2
+	14: ;
+	15: reserved word: if
+	15: (
+	15: ID, name= a
+	15: >=
+	15: NUM, val= 1
+	15: )
+	15: {
+	16: reserved word: if
+	16: (
+	16: ID, name= a
+	16: <
+	16: ID, name= c
+	16: )
+	16: ;
+	17: reserved word: else
+	17: {
+	18: ID, name= b
+	18: =
+	18: ID, name= a
+	18: *
+	18: ID, name= c
+	18: ;
+	19: reserved word: int
+	19: ID, name= arr
+	19: [
+	19: NUM, val= 8
+	19: ]
+	19: ;
+	20: reserved word: int
+	20: ID, name= d
+	20: =
+	20: NUM, val= 888888
+	20: ;
+	21: }
+	23: }
+	24: reserved word: while
+	24: (
+	24: ID, name= c
+	24: >
+	24: ID, name= b
+	24: )
+	24: {
+	26: }
+	27: }
+	28: EOF

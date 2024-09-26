@@ -1,3 +1,240 @@
 
 C-MINUS COMPILATION: cases/test/test.6.txt
-	1: EOF
+	1: reserved word: int
+	1: ID, name= x
+	1: [
+	1: NUM, val= 10
+	1: ]
+	1: ;
+	2: reserved word: int
+	2: ID, name= minloc
+	2: (
+	2: reserved word: int
+	2: ID, name= a
+	2: [
+	2: ]
+	2: ,
+	2: reserved word: int
+	2: ID, name= low
+	2: ,
+	2: reserved word: int
+	2: ID, name= high
+	2: )
+	3: {
+	4: reserved word: int
+	4: ID, name= i
+	4: ;
+	4: reserved word: int
+	4: ID, name= x
+	4: ;
+	4: reserved word: int
+	4: ID, name= k
+	4: ;
+	5: ID, name= k
+	5: =
+	5: ID, name= low
+	5: ;
+	6: ID, name= x
+	6: =
+	6: ID, name= a
+	6: [
+	6: ID, name= low
+	6: ]
+	6: ;
+	7: ID, name= i
+	7: =
+	7: ID, name= low
+	7: +
+	7: NUM, val= 1
+	7: ;
+	8: reserved word: while
+	8: (
+	8: ID, name= i
+	8: <
+	8: ID, name= high
+	8: )
+	9: {
+	10: reserved word: if
+	10: (
+	10: ID, name= a
+	10: [
+	10: ID, name= i
+	10: ]
+	10: <
+	10: ID, name= x
+	10: )
+	11: {
+	12: ID, name= x
+	12: =
+	12: ID, name= a
+	12: [
+	12: ID, name= i
+	12: ]
+	12: ;
+	13: ID, name= k
+	13: =
+	13: ID, name= i
+	13: ;
+	14: }
+	15: ID, name= i
+	15: =
+	15: ID, name= i
+	15: +
+	15: NUM, val= 1
+	15: ;
+	16: }
+	17: reserved word: return
+	17: ID, name= k
+	17: ;
+	18: }
+	19: reserved word: void
+	19: ID, name= sort
+	19: (
+	19: reserved word: int
+	19: ID, name= a
+	19: [
+	19: ]
+	19: ,
+	19: reserved word: int
+	19: ID, name= low
+	19: ,
+	19: reserved word: int
+	19: ID, name= high
+	19: )
+	20: {
+	21: reserved word: int
+	21: ID, name= i
+	21: ;
+	21: reserved word: int
+	21: ID, name= k
+	21: ;
+	22: ID, name= i
+	22: =
+	22: ID, name= low
+	22: ;
+	23: reserved word: while
+	23: (
+	23: ID, name= i
+	23: <
+	23: ID, name= high
+	23: -
+	23: NUM, val= 1
+	23: )
+	24: {
+	25: reserved word: int
+	25: ID, name= t
+	25: ;
+	26: ID, name= k
+	26: =
+	26: ID, name= minloc
+	26: (
+	26: ID, name= a
+	26: ,
+	26: ID, name= i
+	26: ,
+	26: ID, name= high
+	26: )
+	26: ;
+	27: ID, name= t
+	27: =
+	27: ID, name= a
+	27: [
+	27: ID, name= k
+	27: ]
+	27: ;
+	28: ID, name= a
+	28: [
+	28: ID, name= k
+	28: ]
+	28: =
+	28: ID, name= a
+	28: [
+	28: ID, name= i
+	28: ]
+	28: ;
+	29: ID, name= a
+	29: [
+	29: ID, name= i
+	29: ]
+	29: =
+	29: ID, name= t
+	29: ;
+	30: ID, name= i
+	30: =
+	30: ID, name= i
+	30: +
+	30: NUM, val= 1
+	30: ;
+	31: }
+	32: }
+	33: reserved word: void
+	33: ID, name= main
+	33: (
+	33: reserved word: void
+	33: )
+	34: {
+	34: reserved word: int
+	34: ID, name= i
+	34: ;
+	35: ID, name= i
+	35: =
+	35: NUM, val= 0
+	35: ;
+	36: reserved word: while
+	36: (
+	36: ID, name= i
+	36: <
+	36: NUM, val= 10
+	36: )
+	37: {
+	37: ID, name= x
+	37: [
+	37: ID, name= i
+	37: ]
+	37: =
+	37: ID, name= input
+	37: ;
+	38: ID, name= i
+	38: =
+	38: ID, name= i
+	38: +
+	38: NUM, val= 1
+	38: ;
+	39: }
+	40: ID, name= sort
+	40: (
+	40: ID, name= x
+	40: ,
+	40: NUM, val= 0
+	40: ,
+	40: NUM, val= 10
+	40: )
+	40: ;
+	41: ID, name= i
+	41: =
+	41: NUM, val= 0
+	41: ;
+	42: reserved word: while
+	42: (
+	42: ID, name= i
+	42: <
+	42: NUM, val= 10
+	42: )
+	43: {
+	43: ID, name= output
+	43: (
+	43: ID, name= x
+	43: [
+	43: ID, name= i
+	43: ]
+	43: )
+	43: ;
+	44: ID, name= i
+	44: =
+	44: ID, name= i
+	44: +
+	44: NUM, val= 1
+	44: ;
+	45: }
+	46: }
+	47: EOF

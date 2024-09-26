@@ -37,8 +37,6 @@ int compare_files(const char *file1, const char *file2) {
         return 0;
     }
 
-    printf("파일 내용이 일치합니다.\n");
-
     fclose(fp1);
     fclose(fp2);
     return 0;
