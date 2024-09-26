@@ -1,5 +1,5 @@
 
-C-MINUS COMPILATION: tests/test.2.txt
+C-MINUS COMPILATION: cases/test/test.2.txt
 	1: reserved word: void
 	1: ID, name= main
 	1: (

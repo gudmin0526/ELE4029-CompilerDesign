@@ -1,0 +1,3 @@
+
+C-MINUS COMPILATION: cases/test/test.5.txt
+	1: EOF
