@@ -4,4 +4,5 @@ C-MINUS COMPILATION: cases/test/test.3.txt
 	5: /
 	6: *
 	6: /
-	8: EOF
+	8: *
+	9: EOF

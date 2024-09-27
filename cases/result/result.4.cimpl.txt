@@ -1,8 +1,39 @@
 
 C-MINUS COMPILATION: cases/test/test.4.txt
-	1: NUM, val= 123
-	1: ID, name= abc
+	1: ERROR: 123abc
 	1: ;
 	2: ID, name= abc123
 	2: ;
-	3: EOF
+	3: ID, name= abc
+	3: ERROR: !
+	3: NUM, val= 123
+	4: ID, name= abc
+	4: ERROR: @
+	4: NUM, val= 123
+	5: ID, name= abc
+	5: =
+	5: NUM, val= 123
+	6: ID, name= abc
+	6: ==
+	6: NUM, val= 123
+	7: ID, name= abc
+	7: <=
+	7: NUM, val= 123
+	8: ERROR: 123abc
+	8: >=
+	8: NUM, val= 123
+	9: ID, name= abc
+	9: !=
+	9: NUM, val= 123
+	9: ID, name= abc
+	9: ERROR: @
+	9: ERROR: @
+	9: NUM, val= 123
+	10: NUM, val= 123
+	10: ERROR: !
+	10: ID, name= abc
+	10: ;
+	10: ;
+	10: ,
+	10: ,
+	11: EOF

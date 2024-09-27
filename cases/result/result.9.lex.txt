@@ -48,4 +48,4 @@ C-MINUS COMPILATION: cases/test/test.9.txt
 	7: ID, name= sdfasdjfa
 	7: ,
 	7: ID, name= mv
-	21: EOF
+	27: EOF
