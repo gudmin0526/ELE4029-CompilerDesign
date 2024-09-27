@@ -5,11 +5,4 @@ C-MINUS COMPILATION: cases/test/test.4.txt
 	1: ;
 	2: ID, name= abc123
 	2: ;
-	3: ERROR: !
-	3: ERROR: @
-	3: ERROR: #
-	3: ERROR: $
-	3: ERROR: %
-	3: ERROR: ^
-	3: ;
-	4: EOF
+	3: EOF

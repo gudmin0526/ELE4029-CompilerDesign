@@ -17,6 +17,7 @@ digit       [0-9]
 letter      [a-zA-Z]
 number      {digit}+
 identifier  {letter}({letter}|{digit})*
+numid       {number}{letter}+
 newline     \n
 whitespace  [ \t]+
 
@@ -63,6 +64,7 @@ whitespace  [ \t]+
 
 {number}        {return NUM;}
 {identifier}    {return ID;}
+{numid}         {return ERROR;}
 {newline}       {lineno++;}
 {whitespace}    {/* skip whitespace */}
 .               {return ERROR;}

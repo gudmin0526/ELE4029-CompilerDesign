@@ -1,15 +1,7 @@
 
 C-MINUS COMPILATION: cases/test/test.4.txt
-	1: NUM, val= 123
-	1: ID, name= abc
+	1: ERROR: 123abc
 	1: ;
 	2: ID, name= abc123
 	2: ;
-	3: ERROR: !
-	3: ERROR: @
-	3: ERROR: #
-	3: ERROR: $
-	3: ERROR: %
-	3: ERROR: ^
-	3: ;
-	4: EOF
+	3: EOF
