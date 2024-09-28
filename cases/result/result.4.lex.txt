@@ -36,4 +36,12 @@ C-MINUS COMPILATION: cases/test/test.4.txt
 	10: ;
 	10: ,
 	10: ,
-	11: EOF
+	11: ERROR: !
+	11: ERROR: @
+	11: ERROR: #
+	11: ERROR: $
+	11: ERROR: !
+	11: (
+	11: ERROR: !
+	11: )
+	12: EOF
