@@ -165,17 +165,7 @@ TokenType getToken(void) {
                 }
                 break;
             case INNUM:
-                if (isalpha(c)) {
-                    while (isalpha(c)) {
-                        tokenString[tokenStringIndex++] = (char)c;
-                        c = getNextChar();
-                    }
-                    ungetNextChar();
-                    save = FALSE;
-                    state = DONE;
-                    currentToken = ERROR;
-                }
-                else if (!isdigit(c)) { /* backup in the input */
+                if (!isdigit(c)) { /* backup in the input */
                     ungetNextChar();
                     save = FALSE;
                     state = DONE;
