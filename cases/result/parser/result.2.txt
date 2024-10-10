@@ -1,0 +1,16 @@
+
+C-MINUS COMPILATION: cases/test/test.2.txt
+Syntax error at line 1: syntax error
+Current token: reserved word: void
+Syntax error at line 6: syntax error
+Current token: reserved word: while
+Syntax error at line 11: syntax error
+Current token: }
+
+Syntax tree:
+  Assign to: i
+    Const: 0
+  Assign to: i
+    Op: +
+      Id: i
+      Const: 1

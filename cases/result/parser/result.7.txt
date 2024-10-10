@@ -1,0 +1,57 @@
+
+C-MINUS COMPILATION: cases/test/test.7.txt
+Syntax error at line 1: syntax error
+Current token: reserved word: int
+Syntax error at line 5: syntax error
+Current token: [
+Syntax error at line 7: syntax error
+Current token: reserved word: while
+Syntax error at line 10: syntax error
+Current token: }
+Syntax error at line 19: syntax error
+Current token: reserved word: while
+Syntax error at line 21: syntax error
+Current token: (
+Syntax error at line 22: syntax error
+Current token: [
+Syntax error at line 26: syntax error
+Current token: }
+Syntax error at line 32: syntax error
+Current token: reserved word: while
+Syntax error at line 34: syntax error
+Current token: }
+Syntax error at line 37: syntax error
+Current token: reserved word: while
+Syntax error at line 39: syntax error
+Current token: }
+
+Syntax tree:
+  Assign to: k
+    Id: low
+  Assign to: x
+  Assign to: i
+    Op: +
+      Id: low
+      Const: 1
+  Assign to: k
+    Id: i
+  Assign to: i
+    Id: low
+  Assign to: k
+  Assign to: t
+  Assign to: i
+    Op: +
+      Id: i
+      Const: 1
+  Assign to: i
+    Const: 0
+  Assign to: i
+    Op: +
+      Id: i
+      Const: 1
+  Assign to: i
+    Const: 0
+  Assign to: i
+    Op: +
+      Id: i
+      Const: 1

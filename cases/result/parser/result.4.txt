@@ -1,0 +1,6 @@
+
+C-MINUS COMPILATION: cases/test/test.4.txt
+Syntax error at line 1: syntax error
+Current token: NUM, val= 123
+
+Syntax tree:

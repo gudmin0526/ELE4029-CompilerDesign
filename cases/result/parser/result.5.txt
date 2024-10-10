@@ -1,0 +1,6 @@
+
+C-MINUS COMPILATION: cases/test/test.5.txt
+Syntax error at line 1: syntax error
+Current token: ERROR: !
+
+Syntax tree:

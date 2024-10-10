@@ -1,6 +1,6 @@
 /****************************************************/
-/* File: tiny.y                                     */
-/* The TINY Yacc/Bison specification file           */
+/* File: cminus.y                                   */
+/* The C-MINUS Yacc/Bison specification file        */
 /* Compiler Construction: Principles and Practice   */
 /* Kenneth C. Louden                                */
 /****************************************************/
@@ -20,12 +20,13 @@ static int yylex(void); // added 11/2/11 to ensure no conflict with lex
 
 %}
 
-%token IF THEN ELSE END REPEAT UNTIL READ WRITE
+%token IF ELSE WHILE RETURN INT VOID
 %token ID NUM 
-%token ASSIGN EQ LT PLUS MINUS TIMES OVER LPAREN RPAREN SEMI
-%token ERROR 
+%token ASSIGN EQ NE LT LE GT GE PLUS MINUS TIMES OVER LPAREN RPAREN 
+%token LBRACE RBRACE LCURLY RCURLY SEMI COMMA
+%token ENDFILE ERROR
 
-%% /* Grammar for TINY */
+%% /* Grammar for C-MINUS */
 
 program     : stmt_seq
                  { savedTree = $1;} 
