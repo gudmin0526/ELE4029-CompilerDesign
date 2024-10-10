@@ -10,6 +10,13 @@ CFLAGS = -W -Wall
 
 OBJS = main.o util.o lex.yy.o y.tab.o
 
+# MAIN 변수에 따라 전처리기 매크로 설정
+ifeq ($(MAIN), test)
+	CFLAGS += -DMAIN_TEST
+else
+	CFLAGS += -DDEFAULT_MAIN 
+endif
+
 .PHONY: all clean
 all: cminus_parser
 
