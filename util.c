@@ -193,11 +193,11 @@ void printTree( TreeNode * tree )
           fprintf(listing,"Id: %s\n",tree->attr.name);
           break;
         case ParamK:
-          fprintf(listing,"Parameter: name = %s, type = %s\n",
-                  tree->attr.name, tree->vartype);
-          break;
-        case VoidParamK:
-          fprintf(listing,"Void Parameter\n");
+          if (tree->vartype==NULL) /* void parameter, 파라미터가 없는 경우 */
+            fprintf(listing, "Void Parameter\n");
+          else
+            fprintf(listing,"Parameter: name = %s, type = %s\n",
+                    tree->attr.name, tree->vartype);
           break;
         case VarK:
           fprintf(listing,"Variable: name = %s\n",tree->attr.name);

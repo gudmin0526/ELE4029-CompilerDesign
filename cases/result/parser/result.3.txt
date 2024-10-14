@@ -1,6 +1,15 @@
 
 C-MINUS COMPILATION: cases/test/test.3.txt
-Syntax error at line 3: syntax error
-Current token: ID, name= x
 
 Syntax tree:
+  Function Declaration: name = main, return type = int
+    Void Parameter
+    Compound Statement:
+      Variable Declaration: name = b, type = void
+      Variable Declaration: name = c, type = int
+      Assign:
+        Variable: name = d
+          Const: 1
+        Op: +
+          Variable: name = b
+          Variable: name = c

@@ -1,11 +1,11 @@
-int x;
-void x;
-int a[3];
+ /* Semantic Error Example */
+ /* (1) void-type variable a, b
+  * (2) uninitialized variable c (and b)
+  * (3) undefined variable d */
 
-int func(void){
-    int x;
-    int y;
-    return x;
+int main (void a[]) 
+{
+    void b;
+    int c;
+    d[1] = b + c;
 }
-
-int temp; temp = 3 + 5; func(temp);

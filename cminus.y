@@ -63,10 +63,8 @@ var_declaration     : type_specifier identifier SEMI
                           $$->lineno = $2->lineno;                          
                           $$->child[0] = $4; }
                     ;
-type_specifier      : INT { $$ = newExpNode(TypeK); 
-                            $$->vartype = copyString(tokenString); }
-                    | VOID { $$ = newExpNode(TypeK); 
-                            $$->vartype = copyString(tokenString); }
+type_specifier      : int { $$ = $1; }
+                    | void { $$ = $1; }
                     ;
 fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_stmt
                         { $$ = newStmtNode(FunDeclK);
@@ -77,8 +75,8 @@ fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_st
                           $$->child[1] = $6; }
                     ;
 params              : param_list { $$ = $1; }
-                    | VOID { $$ = newExpNode(VoidParamK); 
-                             $$->attr.name = "Void Parameter"; }
+                    | void { $$ = newExpNode(ParamK);
+                             $$->vartype=NULL; }
                     ;
 param_list          : param_list COMMA param
                         { YYSTYPE t = $1;
@@ -97,6 +95,7 @@ param               : type_specifier identifier
                           $$->lineno = $2->lineno; }
                     | type_specifier identifier LBRACE RBRACE
                         { $$ = newExpNode(ParamK); 
+                          strcat($1->vartype, "[]");
                           $$->vartype = $1->vartype;
                           $$->attr.name = $2->attr.name; 
                           $$->lineno = $2->lineno; }
@@ -123,7 +122,7 @@ statement_list      : statement_list statement
                                 t = t->sibling;
                             t->sibling = $2;
                             $$ = $1; }
-                          else $$ = $2; }
+                            else $$ = $2; }
                     | { $$ = NULL; }
                     ;
 statement           : expression_stmt { $$ = $1; }
@@ -249,7 +248,12 @@ number              : NUM { $$ = newExpNode(ConstK);
                             $$->attr.val = atoi(tokenString);
                             $$->lineno = lineno; }
                     ;
-
+int                 : INT { $$ = newExpNode(TypeK); 
+                            $$->vartype = copyString(tokenString); }
+                    ;
+void                : VOID { $$ = newExpNode(TypeK); 
+                             $$->vartype = copyString(tokenString); }
+                    ;
 %%
 
 int yyerror(char * message)
