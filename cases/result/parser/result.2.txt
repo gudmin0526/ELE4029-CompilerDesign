@@ -1,16 +1,44 @@
 
 C-MINUS COMPILATION: cases/test/test.2.txt
-Syntax error at line 1: syntax error
-Current token: reserved word: void
-Syntax error at line 6: syntax error
-Current token: reserved word: while
-Syntax error at line 11: syntax error
-Current token: }
 
 Syntax tree:
-  Assign to: i
-    Const: 0
-  Assign to: i
-    Op: +
-      Id: i
-      Const: 1
+  Function Declaration: name = main, return type = void
+    Void Parameter
+    Compound Statement:
+      Variable Declaration: name = i, type = int
+      Variable Declaration: name = x, type = int[]
+        Const: 5
+      Assign:
+        Variable: name = i
+        Const: 0
+      While Statement:
+        Op: <
+          Variable: name = i
+          Const: 5
+        Compound Statement:
+          Assign:
+            Variable: name = x
+              Variable: name = i
+            Call: function name = input
+          Assign:
+            Variable: name = i
+            Op: +
+              Variable: name = i
+              Const: 1
+      Assign:
+        Variable: name = i
+        Const: 0
+      While Statement:
+        Op: <=
+          Variable: name = i
+          Const: 4
+        Compound Statement:
+          If Statement:
+            Op: !=
+              Variable: name = x
+                Variable: name = i
+              Const: 0
+            Compound Statement:
+              Call: function name = output
+                Variable: name = x
+                  Variable: name = i

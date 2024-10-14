@@ -1,6 +1,11 @@
 
 C-MINUS COMPILATION: cases/test/test.4.txt
-Syntax error at line 1: syntax error
-Current token: NUM, val= 123
 
 Syntax tree:
+  Function Declaration: name = func, return type = int
+    Parameter: name = x, type = int
+    Parameter: name = y, type = void
+    Compound Statement:
+  Function Declaration: name = func, return type = int
+    Void Parameter
+    Compound Statement:

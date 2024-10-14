@@ -1,6 +1,6 @@
 
 C-MINUS COMPILATION: cases/test/test.9.txt
-Syntax error at line 1: syntax error
-Current token: reserved word: int
+Syntax error at line 3: syntax error
+Current token: ID, name= e
 
 Syntax tree:

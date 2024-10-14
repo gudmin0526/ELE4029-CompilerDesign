@@ -8,6 +8,4 @@ int func(void){
     return x;
 }
 
- int temp;
- temp = 3 + 5;
- func(temp);
+int temp; temp = 3 + 5; func(temp);

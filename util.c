@@ -158,8 +158,7 @@ void printTree( TreeNode * tree )
           fprintf(listing,"Return Statement:\n");
           break;
         case AssignK:
-          fprintf(listing,"Assign: %s\n",
-                  tree->attr.name);
+          fprintf(listing,"Assign:\n");
           break;
         case VarDeclK:
           if (tree->child[0]!=NULL) /* type이 Array인 경우 */
@@ -200,7 +199,7 @@ void printTree( TreeNode * tree )
         case VoidParamK:
           fprintf(listing,"Void Parameter\n");
           break;
-        case VarAccK:
+        case VarK:
           fprintf(listing,"Variable: name = %s\n",tree->attr.name);
           break;
         case CallK:

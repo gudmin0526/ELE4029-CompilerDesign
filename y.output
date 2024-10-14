@@ -1,0 +1,1232 @@
+   0  $accept : program $end
+
+   1  program : declaration_list
+
+   2  declaration_list : declaration_list declaration
+   3                   | declaration
+
+   4  declaration : var_declaration
+   5              | fun_declaration
+
+   6  var_declaration : type_specifier identifier SEMI
+   7                  | type_specifier identifier LBRACE number RBRACE SEMI
+
+   8  type_specifier : INT
+   9                 | VOID
+
+  10  fun_declaration : type_specifier identifier LPAREN params RPAREN compound_stmt
+
+  11  params : param_list
+  12         | VOID
+
+  13  param_list : param_list COMMA param
+  14             | param
+
+  15  param : type_specifier identifier
+  16        | type_specifier identifier LBRACE RBRACE
+
+  17  compound_stmt : LCURLY local_declarations statement_list RCURLY
+
+  18  local_declarations : local_declarations var_declaration
+  19                     |
+
+  20  statement_list : statement_list statement
+  21                 |
+
+  22  statement : expression_stmt
+  23            | compound_stmt
+  24            | selection_stmt
+  25            | iteration_stmt
+  26            | return_stmt
+
+  27  expression_stmt : expression SEMI
+  28                  | SEMI
+
+  29  selection_stmt : IF LPAREN expression RPAREN statement
+  30                 | IF LPAREN expression RPAREN statement ELSE statement
+
+  31  iteration_stmt : WHILE LPAREN expression RPAREN statement
+
+  32  return_stmt : RETURN SEMI
+  33              | RETURN expression SEMI
+
+  34  expression : var assignop expression
+  35             | simple_expression
+
+  36  var : identifier
+  37      | identifier LBRACE expression RBRACE
+
+  38  simple_expression : additive_expression relop additive_expression
+  39                    | additive_expression
+
+  40  assignop : ASSIGN
+
+  41  relop : LE
+  42        | LT
+  43        | GT
+  44        | GE
+  45        | EQ
+  46        | NE
+
+  47  additive_expression : additive_expression addop term
+  48                      | term
+
+  49  addop : PLUS
+  50        | MINUS
+
+  51  term : term mulop factor
+  52       | factor
+
+  53  mulop : TIMES
+  54        | OVER
+
+  55  factor : LPAREN expression RPAREN
+  56         | var
+  57         | call
+  58         | number
+
+  59  call : identifier LPAREN args RPAREN
+
+  60  args : arg_list
+  61       |
+
+  62  arg_list : arg_list COMMA expression
+  63           | expression
+
+  64  identifier : ID
+
+  65  number : NUM
+
+state 0
+	$accept : . program $end  (0)
+
+	INT  shift 1
+	VOID  shift 2
+	.  error
+
+	program  goto 3
+	declaration_list  goto 4
+	declaration  goto 5
+	var_declaration  goto 6
+	fun_declaration  goto 7
+	type_specifier  goto 8
+
+
+state 1
+	type_specifier : INT .  (8)
+
+	.  reduce 8
+
+
+state 2
+	type_specifier : VOID .  (9)
+
+	.  reduce 9
+
+
+state 3
+	$accept : program . $end  (0)
+
+	$end  accept
+
+
+state 4
+	program : declaration_list .  (1)
+	declaration_list : declaration_list . declaration  (2)
+
+	INT  shift 1
+	VOID  shift 2
+	$end  reduce 1
+
+	declaration  goto 9
+	var_declaration  goto 6
+	fun_declaration  goto 7
+	type_specifier  goto 8
+
+
+state 5
+	declaration_list : declaration .  (3)
+
+	.  reduce 3
+
+
+state 6
+	declaration : var_declaration .  (4)
+
+	.  reduce 4
+
+
+state 7
+	declaration : fun_declaration .  (5)
+
+	.  reduce 5
+
+
+state 8
+	var_declaration : type_specifier . identifier SEMI  (6)
+	var_declaration : type_specifier . identifier LBRACE number RBRACE SEMI  (7)
+	fun_declaration : type_specifier . identifier LPAREN params RPAREN compound_stmt  (10)
+
+	ID  shift 10
+	.  error
+
+	identifier  goto 11
+
+
+state 9
+	declaration_list : declaration_list declaration .  (2)
+
+	.  reduce 2
+
+
+state 10
+	identifier : ID .  (64)
+
+	.  reduce 64
+
+
+state 11
+	var_declaration : type_specifier identifier . SEMI  (6)
+	var_declaration : type_specifier identifier . LBRACE number RBRACE SEMI  (7)
+	fun_declaration : type_specifier identifier . LPAREN params RPAREN compound_stmt  (10)
+
+	LPAREN  shift 12
+	LBRACE  shift 13
+	SEMI  shift 14
+	.  error
+
+
+state 12
+	fun_declaration : type_specifier identifier LPAREN . params RPAREN compound_stmt  (10)
+
+	INT  shift 1
+	VOID  shift 15
+	.  error
+
+	type_specifier  goto 16
+	params  goto 17
+	param_list  goto 18
+	param  goto 19
+
+
+state 13
+	var_declaration : type_specifier identifier LBRACE . number RBRACE SEMI  (7)
+
+	NUM  shift 20
+	.  error
+
+	number  goto 21
+
+
+state 14
+	var_declaration : type_specifier identifier SEMI .  (6)
+
+	.  reduce 6
+
+
+state 15
+	type_specifier : VOID .  (9)
+	params : VOID .  (12)
+
+	RPAREN  reduce 12
+	ID  reduce 9
+
+
+state 16
+	param : type_specifier . identifier  (15)
+	param : type_specifier . identifier LBRACE RBRACE  (16)
+
+	ID  shift 10
+	.  error
+
+	identifier  goto 22
+
+
+state 17
+	fun_declaration : type_specifier identifier LPAREN params . RPAREN compound_stmt  (10)
+
+	RPAREN  shift 23
+	.  error
+
+
+state 18
+	params : param_list .  (11)
+	param_list : param_list . COMMA param  (13)
+
+	COMMA  shift 24
+	RPAREN  reduce 11
+
+
+state 19
+	param_list : param .  (14)
+
+	.  reduce 14
+
+
+state 20
+	number : NUM .  (65)
+
+	.  reduce 65
+
+
+state 21
+	var_declaration : type_specifier identifier LBRACE number . RBRACE SEMI  (7)
+
+	RBRACE  shift 25
+	.  error
+
+
+state 22
+	param : type_specifier identifier .  (15)
+	param : type_specifier identifier . LBRACE RBRACE  (16)
+
+	LBRACE  shift 26
+	RPAREN  reduce 15
+	COMMA  reduce 15
+
+
+state 23
+	fun_declaration : type_specifier identifier LPAREN params RPAREN . compound_stmt  (10)
+
+	LCURLY  shift 27
+	.  error
+
+	compound_stmt  goto 28
+
+
+state 24
+	param_list : param_list COMMA . param  (13)
+
+	INT  shift 1
+	VOID  shift 2
+	.  error
+
+	type_specifier  goto 16
+	param  goto 29
+
+
+state 25
+	var_declaration : type_specifier identifier LBRACE number RBRACE . SEMI  (7)
+
+	SEMI  shift 30
+	.  error
+
+
+state 26
+	param : type_specifier identifier LBRACE . RBRACE  (16)
+
+	RBRACE  shift 31
+	.  error
+
+
+state 27
+	compound_stmt : LCURLY . local_declarations statement_list RCURLY  (17)
+	local_declarations : .  (19)
+
+	.  reduce 19
+
+	local_declarations  goto 32
+
+
+state 28
+	fun_declaration : type_specifier identifier LPAREN params RPAREN compound_stmt .  (10)
+
+	.  reduce 10
+
+
+state 29
+	param_list : param_list COMMA param .  (13)
+
+	.  reduce 13
+
+
+state 30
+	var_declaration : type_specifier identifier LBRACE number RBRACE SEMI .  (7)
+
+	.  reduce 7
+
+
+state 31
+	param : type_specifier identifier LBRACE RBRACE .  (16)
+
+	.  reduce 16
+
+
+state 32
+	compound_stmt : LCURLY local_declarations . statement_list RCURLY  (17)
+	local_declarations : local_declarations . var_declaration  (18)
+	statement_list : .  (21)
+
+	INT  shift 1
+	VOID  shift 2
+	LCURLY  reduce 21
+	RCURLY  reduce 21
+	LPAREN  reduce 21
+	SEMI  reduce 21
+	ID  reduce 21
+	NUM  reduce 21
+	IF  reduce 21
+	WHILE  reduce 21
+	RETURN  reduce 21
+
+	var_declaration  goto 33
+	type_specifier  goto 34
+	statement_list  goto 35
+
+
+state 33
+	local_declarations : local_declarations var_declaration .  (18)
+
+	.  reduce 18
+
+
+state 34
+	var_declaration : type_specifier . identifier SEMI  (6)
+	var_declaration : type_specifier . identifier LBRACE number RBRACE SEMI  (7)
+
+	ID  shift 10
+	.  error
+
+	identifier  goto 36
+
+
+state 35
+	compound_stmt : LCURLY local_declarations statement_list . RCURLY  (17)
+	statement_list : statement_list . statement  (20)
+
+	LCURLY  shift 27
+	RCURLY  shift 37
+	LPAREN  shift 38
+	SEMI  shift 39
+	ID  shift 10
+	NUM  shift 20
+	IF  shift 40
+	WHILE  shift 41
+	RETURN  shift 42
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	compound_stmt  goto 45
+	statement  goto 46
+	expression_stmt  goto 47
+	selection_stmt  goto 48
+	iteration_stmt  goto 49
+	return_stmt  goto 50
+	expression  goto 51
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 36
+	var_declaration : type_specifier identifier . SEMI  (6)
+	var_declaration : type_specifier identifier . LBRACE number RBRACE SEMI  (7)
+
+	LBRACE  shift 13
+	SEMI  shift 14
+	.  error
+
+
+state 37
+	compound_stmt : LCURLY local_declarations statement_list RCURLY .  (17)
+
+	.  reduce 17
+
+
+state 38
+	factor : LPAREN . expression RPAREN  (55)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 58
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 39
+	expression_stmt : SEMI .  (28)
+
+	.  reduce 28
+
+
+state 40
+	selection_stmt : IF . LPAREN expression RPAREN statement  (29)
+	selection_stmt : IF . LPAREN expression RPAREN statement ELSE statement  (30)
+
+	LPAREN  shift 59
+	.  error
+
+
+state 41
+	iteration_stmt : WHILE . LPAREN expression RPAREN statement  (31)
+
+	LPAREN  shift 60
+	.  error
+
+
+state 42
+	return_stmt : RETURN . SEMI  (32)
+	return_stmt : RETURN . expression SEMI  (33)
+
+	LPAREN  shift 38
+	SEMI  shift 61
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 62
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 43
+	var : identifier .  (36)
+	var : identifier . LBRACE expression RBRACE  (37)
+	call : identifier . LPAREN args RPAREN  (59)
+
+	LPAREN  shift 63
+	LBRACE  shift 64
+	RPAREN  reduce 36
+	RBRACE  reduce 36
+	SEMI  reduce 36
+	COMMA  reduce 36
+	EQ  reduce 36
+	NE  reduce 36
+	LT  reduce 36
+	LE  reduce 36
+	GT  reduce 36
+	GE  reduce 36
+	ASSIGN  reduce 36
+	PLUS  reduce 36
+	MINUS  reduce 36
+	TIMES  reduce 36
+	OVER  reduce 36
+
+
+state 44
+	factor : number .  (58)
+
+	.  reduce 58
+
+
+state 45
+	statement : compound_stmt .  (23)
+
+	.  reduce 23
+
+
+state 46
+	statement_list : statement_list statement .  (20)
+
+	.  reduce 20
+
+
+state 47
+	statement : expression_stmt .  (22)
+
+	.  reduce 22
+
+
+state 48
+	statement : selection_stmt .  (24)
+
+	.  reduce 24
+
+
+state 49
+	statement : iteration_stmt .  (25)
+
+	.  reduce 25
+
+
+state 50
+	statement : return_stmt .  (26)
+
+	.  reduce 26
+
+
+state 51
+	expression_stmt : expression . SEMI  (27)
+
+	SEMI  shift 65
+	.  error
+
+
+state 52
+	expression : var . assignop expression  (34)
+	factor : var .  (56)
+
+	ASSIGN  shift 66
+	RPAREN  reduce 56
+	RBRACE  reduce 56
+	SEMI  reduce 56
+	COMMA  reduce 56
+	EQ  reduce 56
+	NE  reduce 56
+	LT  reduce 56
+	LE  reduce 56
+	GT  reduce 56
+	GE  reduce 56
+	PLUS  reduce 56
+	MINUS  reduce 56
+	TIMES  reduce 56
+	OVER  reduce 56
+
+	assignop  goto 67
+
+
+state 53
+	expression : simple_expression .  (35)
+
+	.  reduce 35
+
+
+state 54
+	simple_expression : additive_expression . relop additive_expression  (38)
+	simple_expression : additive_expression .  (39)
+	additive_expression : additive_expression . addop term  (47)
+
+	EQ  shift 68
+	NE  shift 69
+	LT  shift 70
+	LE  shift 71
+	GT  shift 72
+	GE  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	RPAREN  reduce 39
+	RBRACE  reduce 39
+	SEMI  reduce 39
+	COMMA  reduce 39
+
+	relop  goto 76
+	addop  goto 77
+
+
+state 55
+	additive_expression : term .  (48)
+	term : term . mulop factor  (51)
+
+	TIMES  shift 78
+	OVER  shift 79
+	RPAREN  reduce 48
+	RBRACE  reduce 48
+	SEMI  reduce 48
+	COMMA  reduce 48
+	EQ  reduce 48
+	NE  reduce 48
+	LT  reduce 48
+	LE  reduce 48
+	GT  reduce 48
+	GE  reduce 48
+	PLUS  reduce 48
+	MINUS  reduce 48
+
+	mulop  goto 80
+
+
+state 56
+	term : factor .  (52)
+
+	.  reduce 52
+
+
+state 57
+	factor : call .  (57)
+
+	.  reduce 57
+
+
+state 58
+	factor : LPAREN expression . RPAREN  (55)
+
+	RPAREN  shift 81
+	.  error
+
+
+state 59
+	selection_stmt : IF LPAREN . expression RPAREN statement  (29)
+	selection_stmt : IF LPAREN . expression RPAREN statement ELSE statement  (30)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 82
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 60
+	iteration_stmt : WHILE LPAREN . expression RPAREN statement  (31)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 83
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 61
+	return_stmt : RETURN SEMI .  (32)
+
+	.  reduce 32
+
+
+state 62
+	return_stmt : RETURN expression . SEMI  (33)
+
+	SEMI  shift 84
+	.  error
+
+
+state 63
+	call : identifier LPAREN . args RPAREN  (59)
+	args : .  (61)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	RPAREN  reduce 61
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 85
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+	args  goto 86
+	arg_list  goto 87
+
+
+state 64
+	var : identifier LBRACE . expression RBRACE  (37)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 88
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 65
+	expression_stmt : expression SEMI .  (27)
+
+	.  reduce 27
+
+
+state 66
+	assignop : ASSIGN .  (40)
+
+	.  reduce 40
+
+
+state 67
+	expression : var assignop . expression  (34)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 89
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 68
+	relop : EQ .  (45)
+
+	.  reduce 45
+
+
+state 69
+	relop : NE .  (46)
+
+	.  reduce 46
+
+
+state 70
+	relop : LT .  (42)
+
+	.  reduce 42
+
+
+state 71
+	relop : LE .  (41)
+
+	.  reduce 41
+
+
+state 72
+	relop : GT .  (43)
+
+	.  reduce 43
+
+
+state 73
+	relop : GE .  (44)
+
+	.  reduce 44
+
+
+state 74
+	addop : PLUS .  (49)
+
+	.  reduce 49
+
+
+state 75
+	addop : MINUS .  (50)
+
+	.  reduce 50
+
+
+state 76
+	simple_expression : additive_expression relop . additive_expression  (38)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	var  goto 90
+	additive_expression  goto 91
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 77
+	additive_expression : additive_expression addop . term  (47)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	var  goto 90
+	term  goto 92
+	factor  goto 56
+	call  goto 57
+
+
+state 78
+	mulop : TIMES .  (53)
+
+	.  reduce 53
+
+
+state 79
+	mulop : OVER .  (54)
+
+	.  reduce 54
+
+
+state 80
+	term : term mulop . factor  (51)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	var  goto 90
+	factor  goto 93
+	call  goto 57
+
+
+state 81
+	factor : LPAREN expression RPAREN .  (55)
+
+	.  reduce 55
+
+
+state 82
+	selection_stmt : IF LPAREN expression . RPAREN statement  (29)
+	selection_stmt : IF LPAREN expression . RPAREN statement ELSE statement  (30)
+
+	RPAREN  shift 94
+	.  error
+
+
+state 83
+	iteration_stmt : WHILE LPAREN expression . RPAREN statement  (31)
+
+	RPAREN  shift 95
+	.  error
+
+
+state 84
+	return_stmt : RETURN expression SEMI .  (33)
+
+	.  reduce 33
+
+
+state 85
+	arg_list : expression .  (63)
+
+	.  reduce 63
+
+
+state 86
+	call : identifier LPAREN args . RPAREN  (59)
+
+	RPAREN  shift 96
+	.  error
+
+
+state 87
+	args : arg_list .  (60)
+	arg_list : arg_list . COMMA expression  (62)
+
+	COMMA  shift 97
+	RPAREN  reduce 60
+
+
+state 88
+	var : identifier LBRACE expression . RBRACE  (37)
+
+	RBRACE  shift 98
+	.  error
+
+
+state 89
+	expression : var assignop expression .  (34)
+
+	.  reduce 34
+
+
+state 90
+	factor : var .  (56)
+
+	.  reduce 56
+
+
+state 91
+	simple_expression : additive_expression relop additive_expression .  (38)
+	additive_expression : additive_expression . addop term  (47)
+
+	PLUS  shift 74
+	MINUS  shift 75
+	RPAREN  reduce 38
+	RBRACE  reduce 38
+	SEMI  reduce 38
+	COMMA  reduce 38
+
+	addop  goto 77
+
+
+state 92
+	additive_expression : additive_expression addop term .  (47)
+	term : term . mulop factor  (51)
+
+	TIMES  shift 78
+	OVER  shift 79
+	RPAREN  reduce 47
+	RBRACE  reduce 47
+	SEMI  reduce 47
+	COMMA  reduce 47
+	EQ  reduce 47
+	NE  reduce 47
+	LT  reduce 47
+	LE  reduce 47
+	GT  reduce 47
+	GE  reduce 47
+	PLUS  reduce 47
+	MINUS  reduce 47
+
+	mulop  goto 80
+
+
+state 93
+	term : term mulop factor .  (51)
+
+	.  reduce 51
+
+
+state 94
+	selection_stmt : IF LPAREN expression RPAREN . statement  (29)
+	selection_stmt : IF LPAREN expression RPAREN . statement ELSE statement  (30)
+
+	LCURLY  shift 27
+	LPAREN  shift 38
+	SEMI  shift 39
+	ID  shift 10
+	NUM  shift 20
+	IF  shift 40
+	WHILE  shift 41
+	RETURN  shift 42
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	compound_stmt  goto 45
+	statement  goto 99
+	expression_stmt  goto 47
+	selection_stmt  goto 48
+	iteration_stmt  goto 49
+	return_stmt  goto 50
+	expression  goto 51
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 95
+	iteration_stmt : WHILE LPAREN expression RPAREN . statement  (31)
+
+	LCURLY  shift 27
+	LPAREN  shift 38
+	SEMI  shift 39
+	ID  shift 10
+	NUM  shift 20
+	IF  shift 40
+	WHILE  shift 41
+	RETURN  shift 42
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	compound_stmt  goto 45
+	statement  goto 100
+	expression_stmt  goto 47
+	selection_stmt  goto 48
+	iteration_stmt  goto 49
+	return_stmt  goto 50
+	expression  goto 51
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 96
+	call : identifier LPAREN args RPAREN .  (59)
+
+	.  reduce 59
+
+
+state 97
+	arg_list : arg_list COMMA . expression  (62)
+
+	LPAREN  shift 38
+	ID  shift 10
+	NUM  shift 20
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	expression  goto 101
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 98
+	var : identifier LBRACE expression RBRACE .  (37)
+
+	.  reduce 37
+
+
+state 99
+	selection_stmt : IF LPAREN expression RPAREN statement .  (29)
+	selection_stmt : IF LPAREN expression RPAREN statement . ELSE statement  (30)
+
+	ELSE  shift 102
+	LCURLY  reduce 29
+	RCURLY  reduce 29
+	LPAREN  reduce 29
+	SEMI  reduce 29
+	ID  reduce 29
+	NUM  reduce 29
+	IF  reduce 29
+	WHILE  reduce 29
+	RETURN  reduce 29
+
+
+state 100
+	iteration_stmt : WHILE LPAREN expression RPAREN statement .  (31)
+
+	.  reduce 31
+
+
+state 101
+	arg_list : arg_list COMMA expression .  (62)
+
+	.  reduce 62
+
+
+state 102
+	selection_stmt : IF LPAREN expression RPAREN statement ELSE . statement  (30)
+
+	LCURLY  shift 27
+	LPAREN  shift 38
+	SEMI  shift 39
+	ID  shift 10
+	NUM  shift 20
+	IF  shift 40
+	WHILE  shift 41
+	RETURN  shift 42
+	.  error
+
+	identifier  goto 43
+	number  goto 44
+	compound_stmt  goto 45
+	statement  goto 103
+	expression_stmt  goto 47
+	selection_stmt  goto 48
+	iteration_stmt  goto 49
+	return_stmt  goto 50
+	expression  goto 51
+	var  goto 52
+	simple_expression  goto 53
+	additive_expression  goto 54
+	term  goto 55
+	factor  goto 56
+	call  goto 57
+
+
+state 103
+	selection_stmt : IF LPAREN expression RPAREN statement ELSE statement .  (30)
+
+	.  reduce 30
+
+
+32 terminals, 33 nonterminals
+66 grammar rules, 104 states
+
+grammar parser grammar
+symbol# value# symbol
+     0      0  $end
+     1    256  error
+     2    257  LCURLY
+     3    258  RCURLY
+     4    259  LPAREN
+     5    260  RPAREN
+     6    261  LBRACE
+     7    262  RBRACE
+     8    263  SEMI
+     9    264  COMMA
+    10    265  INT
+    11    266  VOID
+    12    267  ID
+    13    268  NUM
+    14    269  ENDFILE
+    15    270  ERROR
+    16    271  IF
+    17    272  WHILE
+    18    273  RETURN
+    19    274  LOWER_THAN_ELSE
+    20    275  ELSE
+    21    276  EQ
+    22    277  NE
+    23    278  LT
+    24    279  LE
+    25    280  GT
+    26    281  GE
+    27    282  ASSIGN
+    28    283  PLUS
+    29    284  MINUS
+    30    285  TIMES
+    31    286  OVER
+    32    287  $accept
+    33    288  program
+    34    289  declaration_list
+    35    290  declaration
+    36    291  var_declaration
+    37    292  fun_declaration
+    38    293  type_specifier
+    39    294  identifier
+    40    295  number
+    41    296  params
+    42    297  compound_stmt
+    43    298  param_list
+    44    299  param
+    45    300  local_declarations
+    46    301  statement_list
+    47    302  statement
+    48    303  expression_stmt
+    49    304  selection_stmt
+    50    305  iteration_stmt
+    51    306  return_stmt
+    52    307  expression
+    53    308  var
+    54    309  assignop
+    55    310  simple_expression
+    56    311  additive_expression
+    57    312  relop
+    58    313  addop
+    59    314  term
+    60    315  mulop
+    61    316  factor
+    62    317  call
+    63    318  args
+    64    319  arg_list

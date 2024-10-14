@@ -38,7 +38,7 @@ static int yylex(void); // added 11/2/11 to ensure no conflict with lex
 
 program             : declaration_list { savedTree = $1; } 
                     ;
-declaration_list     : declaration_list declaration
+declaration_list    : declaration_list declaration
                         { YYSTYPE t = $1;
                           if (t != NULL)
                           { while (t->sibling != NULL)
@@ -155,21 +155,20 @@ return_stmt         : RETURN SEMI { $$ = newStmtNode(ReturnK); }
                         { $$ = newStmtNode(ReturnK); 
                           $$->child[0] = $2; }
                     ;
-expression          : var ASSIGN expression 
+expression          : var assignop expression 
                         { $$ = newStmtNode(AssignK);
-                          printf("1234\n");
                           $$->child[0] = $1;
                           $$->child[1] = $3;
-                          $$->attr.op = ASSIGN; }
+                          $$->attr.op = $2->attr.op; }
                     | simple_expression { $$ = $1; }
                     ;
-var                 : identifier { $$ = newExpNode(VarAccK);
+var                 : identifier { $$ = newExpNode(VarK);
                                    $$->attr.name = $1->attr.name;
                                    $$->lineno = $1->lineno; }
                     | identifier LBRACE expression RBRACE
-                        { $$ = newExpNode(VarAccK);
+                        { $$ = newExpNode(VarK);
                           $$->attr.name = $1->attr.name;
-                          $$->lineno = $1->lineno;;
+                          $$->lineno = $1->lineno;
                           $$->child[0] = $3; }
                     ;
 simple_expression   : additive_expression relop additive_expression
@@ -179,6 +178,8 @@ simple_expression   : additive_expression relop additive_expression
                           $$->attr.op = $2->attr.op; }
                     | additive_expression { $$ = $1; }
                     ;
+assignop            : ASSIGN { $$ = newExpNode(OpK);
+                               $$->attr.op = ASSIGN; }
 relop               : LE { $$ = newExpNode(OpK);
                            $$->attr.op = LE; } 
                     | LT { $$ = newExpNode(OpK);

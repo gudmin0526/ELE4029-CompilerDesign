@@ -2,13 +2,5 @@
 C-MINUS COMPILATION: cases/test/test.6.txt
 Syntax error at line 1: syntax error
 Current token: ERROR: #
-Syntax error at line 16: syntax error
-Current token: reserved word: int
-Syntax error at line 17: syntax error
-Current token: )
-Syntax error at line 17: syntax error
-Current token: (
-Syntax error at line 18: syntax error
-Current token: ERROR: |
 
 Syntax tree:

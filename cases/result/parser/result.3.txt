@@ -1,6 +1,6 @@
 
 C-MINUS COMPILATION: cases/test/test.3.txt
-Syntax error at line 4: syntax error
-Current token: /
+Syntax error at line 3: syntax error
+Current token: ID, name= x
 
 Syntax tree:

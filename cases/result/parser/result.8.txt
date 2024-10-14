@@ -1,6 +1,6 @@
 
 C-MINUS COMPILATION: cases/test/test.8.txt
 Syntax error at line 1: syntax error
-Current token: ;
+Current token: ID, name= intgcd
 
 Syntax tree:
