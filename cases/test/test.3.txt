@@ -1,5 +1,13 @@
-/* abcd */ /*/abcd     */
-/**/ /* * / */
-/***/ /****/
-/ * /* abcd
-*/ /* abcdefg
+int x;
+void x;
+int a[3];
+
+int func(void){
+    int x;
+    int y;
+    return x;
+}
+
+ int temp;
+ temp = 3 + 5;
+ func(temp);

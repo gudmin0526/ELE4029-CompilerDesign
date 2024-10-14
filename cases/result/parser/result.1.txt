@@ -2,11 +2,5 @@
 C-MINUS COMPILATION: cases/test/test.1.txt
 Syntax error at line 4: syntax error
 Current token: reserved word: int
-Syntax error at line 14: syntax error
-Current token: (
-Syntax error at line 14: syntax error
-Current token: (
 
 Syntax tree:
-  Assign to: x
-  Assign to: y

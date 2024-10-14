@@ -1,12 +1,2 @@
-123abc;
-abc123;
-abc!123
-abc@123
-abc=123
-abc == 123
-abc <= 123
-123abc>=123
-abc!=123 abc@@123
-123!abc;
-abc123abc
-123abc123
+int func(int x, void y){}
+int func(void){}

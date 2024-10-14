@@ -1,7 +1,7 @@
 /****************************************************/
 /* File: util.c                                     */
 /* Utility function implementation                  */
-/* for the TINY compiler                            */
+/* for the C-MINUS compiler                         */
 /* Compiler Construction: Principles and Practice   */
 /* Kenneth C. Louden                                */
 /****************************************************/
@@ -146,19 +146,35 @@ void printTree( TreeNode * tree )
     if (tree->nodekind==StmtK)
     { switch (tree->kind.stmt) {
         case IfK:
-          fprintf(listing,"If\n");
+          fprintf(listing,"If Statement:\n");
           break;
-        case RepeatK:
-          fprintf(listing,"Repeat\n");
+        case IfElseK:
+          fprintf(listing,"If-Else Statement:\n");
+          break;
+        case WhileK:
+          fprintf(listing,"While Statement:\n");
+          break;
+        case ReturnK:
+          fprintf(listing,"Return Statement:\n");
           break;
         case AssignK:
-          fprintf(listing,"Assign to: %s\n",tree->attr.name);
+          fprintf(listing,"Assign: %s\n",
+                  tree->attr.name);
           break;
-        case ReadK:
-          fprintf(listing,"Read: %s\n",tree->attr.name);
+        case VarDeclK:
+          if (tree->child[0]!=NULL) /* type이 Array인 경우 */
+            fprintf(listing,"Variable Declaration: name = %s, type = %s[]\n",
+                    tree->attr.name, tree->vartype);
+          else 
+            fprintf(listing,"Variable Declaration: name = %s, type = %s\n",
+                    tree->attr.name, tree->vartype);
           break;
-        case WriteK:
-          fprintf(listing,"Write\n");
+        case FunDeclK:          
+          fprintf(listing,"Function Declaration: name = %s, return type = %s\n",
+                  tree->attr.name, tree->vartype);         
+          break;
+        case CmpdK:
+          fprintf(listing,"Compound Statement:\n");
           break;
         default:
           fprintf(listing,"Unknown ExpNode kind\n");
@@ -176,6 +192,19 @@ void printTree( TreeNode * tree )
           break;
         case IdK:
           fprintf(listing,"Id: %s\n",tree->attr.name);
+          break;
+        case ParamK:
+          fprintf(listing,"Parameter: name = %s, type = %s\n",
+                  tree->attr.name, tree->vartype);
+          break;
+        case VoidParamK:
+          fprintf(listing,"Void Parameter\n");
+          break;
+        case VarAccK:
+          fprintf(listing,"Variable: name = %s\n",tree->attr.name);
+          break;
+        case CallK:
+          fprintf(listing,"Call: function name = %s\n",tree->attr.name);
           break;
         default:
           fprintf(listing,"Unknown ExpNode kind\n");
