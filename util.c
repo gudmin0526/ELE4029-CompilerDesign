@@ -155,17 +155,16 @@ void printTree( TreeNode * tree )
           fprintf(listing,"While Statement:\n");
           break;
         case ReturnK:
-          fprintf(listing,"Return Statement:\n");
+          if(tree->child[0]==NULL)
+            fprintf(listing,"Non-value Return Statement\n");
+          else 
+            fprintf(listing,"Return Statement:\n");
           break;
         case AssignK:
           fprintf(listing,"Assign:\n");
           break;
         case VarDeclK:
-          if (tree->child[0]!=NULL) /* type이 Array인 경우 */
-            fprintf(listing,"Variable Declaration: name = %s, type = %s[]\n",
-                    tree->attr.name, tree->vartype);
-          else 
-            fprintf(listing,"Variable Declaration: name = %s, type = %s\n",
+        fprintf(listing,"Variable Declaration: name = %s, type = %s\n",
                     tree->attr.name, tree->vartype);
           break;
         case FunDeclK:          
@@ -204,6 +203,9 @@ void printTree( TreeNode * tree )
           break;
         case CallK:
           fprintf(listing,"Call: function name = %s\n",tree->attr.name);
+          break;
+        case TypeK:
+          fprintf(listing,"%s\n",tree->vartype);
           break;
         default:
           fprintf(listing,"Unknown ExpNode kind\n");

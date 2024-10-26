@@ -2,10 +2,20 @@
 C-MINUS COMPILATION: cases/test/test.4.txt
 
 Syntax tree:
-  Function Declaration: name = func, return type = int
-    Parameter: name = x, type = int
-    Parameter: name = y, type = void
-    Compound Statement:
-  Function Declaration: name = func, return type = int
+  Function Declaration: name = main, return type = void
     Void Parameter
     Compound Statement:
+      If Statement:
+        Op: <
+          Variable: name = a
+          Const: 0
+        If-Else Statement:
+          Op: >
+            Variable: name = a
+            Const: 3
+          Assign:
+            Variable: name = a
+            Const: 3
+          Assign:
+            Variable: name = a
+            Const: 4

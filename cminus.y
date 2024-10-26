@@ -53,14 +53,15 @@ declaration         : var_declaration { $$ = $1; }
                     ;
 var_declaration     : type_specifier identifier SEMI 
                         { $$ = newStmtNode(VarDeclK);
+                          $$->lineno = $2->lineno;  
                           $$->vartype = $1->vartype;
-                          $$->attr.name = $2->attr.name;
-                          $$->lineno = $2->lineno; }
+                          $$->attr.name = $2->attr.name; }
                     | type_specifier identifier LBRACE number RBRACE SEMI
                         { $$ = newStmtNode(VarDeclK);
+                          $$->lineno = $2->lineno;
+                          strcat($1->vartype, "[]");                            
                           $$->vartype = $1->vartype;
-                          $$->attr.name = $2->attr.name;
-                          $$->lineno = $2->lineno;                          
+                          $$->attr.name = $2->attr.name;                        
                           $$->child[0] = $4; }
                     ;
 type_specifier      : int { $$ = $1; }
@@ -68,14 +69,15 @@ type_specifier      : int { $$ = $1; }
                     ;
 fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_stmt
                         { $$ = newStmtNode(FunDeclK);
+                          $$->lineno = $2->lineno;  
                           $$->vartype = $1->vartype;
                           $$->attr.name = $2->attr.name;
-                          $$->lineno = $2->lineno;
                           $$->child[0] = $4;
                           $$->child[1] = $6; }
                     ;
 params              : param_list { $$ = $1; }
                     | void { $$ = newExpNode(ParamK);
+                             $$->lineno = lineno;
                              $$->vartype=NULL; }
                     ;
 param_list          : param_list COMMA param
@@ -89,19 +91,20 @@ param_list          : param_list COMMA param
                     | param { $$ = $1; }
                     ;
 param               : type_specifier identifier 
-                        { $$ = newExpNode(ParamK); 
+                        { $$ = newExpNode(ParamK);
+                          $$->lineno = $2->lineno;   
                           $$->vartype = $1->vartype;
-                          $$->attr.name = $2->attr.name;
-                          $$->lineno = $2->lineno; }
+                          $$->attr.name = $2->attr.name; }
                     | type_specifier identifier LBRACE RBRACE
-                        { $$ = newExpNode(ParamK); 
+                        { $$ = newExpNode(ParamK);
+                          $$->lineno = $2->lineno;   
                           strcat($1->vartype, "[]");
                           $$->vartype = $1->vartype;
-                          $$->attr.name = $2->attr.name; 
-                          $$->lineno = $2->lineno; }
+                          $$->attr.name = $2->attr.name; }
                     ;
 compound_stmt       : LCURLY local_declarations statement_list RCURLY
                         { $$ = newStmtNode(CmpdK); 
+                          $$->lineno = lineno;
                           $$->child[0] = $2;
                           $$->child[1] = $3; }
                     ;
@@ -135,73 +138,92 @@ expression_stmt     : expression SEMI { $$ = $1; }
                     | SEMI { $$ = NULL; }
                     ;
 selection_stmt      : IF LPAREN expression RPAREN statement %prec LOWER_THAN_ELSE
-                        { $$ = newStmtNode(IfK);
+                        { $$ = newStmtNode(IfK);                             
+                          $$->lineno = lineno;
                           $$->child[0] = $3;
                           $$->child[1] = $5; }
                     | IF LPAREN expression RPAREN statement ELSE statement
                         { $$ = newStmtNode(IfElseK);
+                          $$->lineno = lineno;                        
                           $$->child[0] = $3;
                           $$->child[1] = $5;
                           $$->child[2] = $7; }
                     ;
 iteration_stmt      : WHILE LPAREN expression RPAREN statement
                         { $$ = newStmtNode(WhileK);
+                          $$->lineno = lineno;
                           $$->child[0] = $3;
                           $$->child[1] = $5; }
                     ;
-return_stmt         : RETURN SEMI { $$ = newStmtNode(ReturnK); }
+return_stmt         : RETURN SEMI 
+                        { $$ = newStmtNode(ReturnK); 
+                          $$->lineno = lineno; }
                     | RETURN expression SEMI
                         { $$ = newStmtNode(ReturnK); 
+                          $$->lineno = lineno;
                           $$->child[0] = $2; }
                     ;
 expression          : var assignop expression 
                         { $$ = newStmtNode(AssignK);
+                          $$->lineno = lineno;
                           $$->child[0] = $1;
                           $$->child[1] = $3;
                           $$->attr.op = $2->attr.op; }
                     | simple_expression { $$ = $1; }
                     ;
-var                 : identifier { $$ = newExpNode(VarK);
-                                   $$->attr.name = $1->attr.name;
-                                   $$->lineno = $1->lineno; }
+var                 : identifier 
+                        { $$ = newExpNode(VarK);
+                          $$->lineno = $1->lineno;
+                          $$->attr.name = $1->attr.name; }
                     | identifier LBRACE expression RBRACE
                         { $$ = newExpNode(VarK);
-                          $$->attr.name = $1->attr.name;
                           $$->lineno = $1->lineno;
+                          $$->attr.name = $1->attr.name;
                           $$->child[0] = $3; }
                     ;
 simple_expression   : additive_expression relop additive_expression
                         { $$ = newExpNode(OpK); 
+                          $$->lineno = lineno;
                           $$->child[0] = $1;
                           $$->child[1] = $3;
                           $$->attr.op = $2->attr.op; }
                     | additive_expression { $$ = $1; }
                     ;
 assignop            : ASSIGN { $$ = newExpNode(OpK);
+                               $$->lineno = lineno;
                                $$->attr.op = ASSIGN; }
 relop               : LE { $$ = newExpNode(OpK);
+                           $$->lineno = lineno;
                            $$->attr.op = LE; } 
                     | LT { $$ = newExpNode(OpK);
+                           $$->lineno = lineno;                    
                            $$->attr.op = LT; } 
                     | GT { $$ = newExpNode(OpK);
+                           $$->lineno = lineno;                    
                            $$->attr.op = GT; } 
                     | GE { $$ = newExpNode(OpK);
+                           $$->lineno = lineno;                                    
                            $$->attr.op = GE; } 
                     | EQ { $$ = newExpNode(OpK);
+                           $$->lineno = lineno;                    
                            $$->attr.op = EQ; } 
                     | NE { $$ = newExpNode(OpK);
+                           $$->lineno = lineno;                                        
                            $$->attr.op = NE; } 
                     ;
 additive_expression : additive_expression addop term 
                         { $$ = newExpNode(OpK); 
+                          $$->lineno = lineno;                    
                           $$->child[0] = $1;
                           $$->child[1] = $3;
                           $$->attr.op = $2->attr.op; }
                     | term { $$ = $1; }
                     ;
 addop               : PLUS { $$ = newExpNode(OpK);
+                             $$->lineno = lineno;                    
                              $$->attr.op = PLUS; } 
                     | MINUS { $$ = newExpNode(OpK);
+                              $$->lineno = lineno;                    
                               $$->attr.op = MINUS; } 
                     ;
 term                : term mulop factor
@@ -212,8 +234,10 @@ term                : term mulop factor
                     | factor { $$ = $1; }
                     ;
 mulop               : TIMES { $$ = newExpNode(OpK);
+                              $$->lineno = lineno;                    
                               $$->attr.op = TIMES; } 
                     | OVER  { $$ = newExpNode(OpK);
+                              $$->lineno = lineno;                    
                               $$->attr.op = OVER; } 
                     ;
 factor              : LPAREN expression RPAREN { $$ = $2; }
@@ -222,9 +246,9 @@ factor              : LPAREN expression RPAREN { $$ = $2; }
                     | number { $$ = $1; }
                     ;
 call                : identifier LPAREN args RPAREN
-                        { $$ = newExpNode(CallK); 
+                        { $$ = newExpNode(CallK);
+                          $$->lineno = $1->lineno;                        
                           $$->attr.name = $1->attr.name;
-                          $$->lineno = $1->lineno;
                           $$->child[0] = $3; }
                     ;
 args                : arg_list { $$ = $1; }
@@ -249,10 +273,12 @@ number              : NUM { $$ = newExpNode(ConstK);
                             $$->lineno = lineno; }
                     ;
 int                 : INT { $$ = newExpNode(TypeK); 
-                            $$->vartype = copyString(tokenString); }
+                            $$->vartype = copyString(tokenString);
+                            $$->lineno = lineno; }
                     ;
 void                : VOID { $$ = newExpNode(TypeK); 
-                             $$->vartype = copyString(tokenString); }
+                             $$->vartype = copyString(tokenString);
+                             $$->lineno = lineno; }
                     ;
 %%
 

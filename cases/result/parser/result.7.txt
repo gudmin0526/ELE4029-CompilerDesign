@@ -5,7 +5,7 @@ Syntax tree:
   Variable Declaration: name = x, type = int[]
     Const: 10
   Function Declaration: name = minloc, return type = int
-    Parameter: name = a, type = int
+    Parameter: name = a, type = int[]
     Parameter: name = low, type = int
     Parameter: name = high, type = int
     Compound Statement:
@@ -50,7 +50,7 @@ Syntax tree:
       Return Statement:
         Variable: name = k
   Function Declaration: name = sort, return type = void
-    Parameter: name = a, type = int
+    Parameter: name = a, type = int[]
     Parameter: name = low, type = int
     Parameter: name = high, type = int
     Compound Statement:

@@ -3,7 +3,7 @@ C-MINUS COMPILATION: cases/test/test.3.txt
 
 Syntax tree:
   Function Declaration: name = main, return type = int
-    Void Parameter
+    Parameter: name = a, type = void[]
     Compound Statement:
       Variable Declaration: name = b, type = void
       Variable Declaration: name = c, type = int
