@@ -1,4 +1,0 @@
-void main(void) {}
-void main(void a, int b) {}
-void main(int a, void b) {}
-void main(void a[]) {}

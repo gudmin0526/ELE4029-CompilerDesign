@@ -50,7 +50,8 @@ static void insertNode( TreeNode * t)
   { case StmtK:
       switch (t->kind.stmt)
       { case AssignK:
-        case ReadK:
+        case FunDeclK:
+        case VarDeclK:
           if (st_lookup(t->attr.name) == -1)
           /* not yet in table, so treat as new definition */
             st_insert(t->attr.name,t->lineno,location++);
@@ -110,15 +111,20 @@ static void checkNode(TreeNode * t)
           if ((t->child[0]->type != Integer) ||
               (t->child[1]->type != Integer))
             typeError(t,"Op applied to non-integer");
-          if ((t->attr.op == EQ) || (t->attr.op == LT))
-            t->type = Boolean;
-          else
-            t->type = Integer;
           break;
+        case TypeK:
+        /* NEED TO IMPLEMENT */
         case ConstK:
+        /* NEED TO IMPLEMENT */ 
         case IdK:
           t->type = Integer;
           break;
+        case ParamK:
+        /* NEED TO IMPLEMENT */
+        case VarK:
+        /* NEED TO IMPLEMENT */
+        case CallK:
+        /* NEED TO IMPLEMENT */
         default:
           break;
       }
@@ -129,17 +135,22 @@ static void checkNode(TreeNode * t)
           if (t->child[0]->type == Integer)
             typeError(t->child[0],"if test is not Boolean");
           break;
+        case IfElseK:
+        /* NEED TO IMPLEMENT */
+        case WhileK:
+        /* NEED TO IMPLEMENT */
+        case ReturnK:
+        /* NEED TO IMPLEMENT */
         case AssignK:
           if (t->child[0]->type != Integer)
             typeError(t->child[0],"assignment of non-integer value");
+        case VarDeclK:
+        /* NEED TO IMPLEMENT */
+        case FunDeclK:
+        /* NEED TO IMPLEMENT */
+        case CmpdK:
+        /* NEED TO IMPLEMENT */
           break;
-        case WriteK:
-          if (t->child[0]->type != Integer)
-            typeError(t->child[0],"write of non-integer value");
-          break;
-        case RepeatK:
-          if (t->child[1]->type == Integer)
-            typeError(t->child[1],"repeat test is not Boolean");
           break;
         default:
           break;

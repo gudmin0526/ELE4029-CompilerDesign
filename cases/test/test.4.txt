@@ -1,1 +1,7 @@
-void main(void) { if ( a < 0 ) if ( a > 3) a = 3; else a = 4; }
+int main(void)
+{
+    int x[5];
+    x[output(5)] = 3 + 5;
+
+    return 0;
+}

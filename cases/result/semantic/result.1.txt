@@ -1,0 +1,24 @@
+
+C-MINUS COMPILATION: cases/test/test.1.txt
+
+Building Symbol Table...
+
+Symbol table:
+
+Variable Name  Location   Line Numbers
+-------------  --------   ------------
+main           1           11 
+x              2           13 
+y              3           13 
+gcd            0            4 
+
+Checking Types...
+Type error at line 6: Op applied to non-integer
+Type error at line 6: assignment of non-integer value
+Type error at line 7: Op applied to non-integer
+Type error at line 7: Op applied to non-integer
+Type error at line 7: Op applied to non-integer
+Type error at line 7: assignment of non-integer value
+Type error at line 6: assignment of non-integer value
+
+Type Checking Finished

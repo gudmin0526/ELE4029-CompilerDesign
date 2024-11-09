@@ -1,11 +1,13 @@
- /* Semantic Error Example */
- /* (1) void-type variable a, b
-  * (2) uninitialized variable c (and b)
-  * (3) undefined variable d */
-
-int main (void a[]) 
+int x(int y)
 {
-    void b;
+    return y + 1;
+}
+
+int main(void)
+{
+    int a;
+    int b;
     int c;
-    d[1] = b + c;
+
+    return x(a, b, c);
 }

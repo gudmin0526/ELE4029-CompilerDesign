@@ -55,12 +55,19 @@ var_declaration     : type_specifier identifier SEMI
                         { $$ = newStmtNode(VarDeclK);
                           $$->lineno = $2->lineno;  
                           $$->vartype = $1->vartype;
+                          $$->type = $1->type;
                           $$->attr.name = $2->attr.name; }
                     | type_specifier identifier LBRACE number RBRACE SEMI
                         { $$ = newStmtNode(VarDeclK);
                           $$->lineno = $2->lineno;
+                          
+                          if (!strcmp($1->vartype, "void"))
+                            $$->type = VoidArray;
+                          else
+                            $$->type = IntegerArray;
+        
                           strcat($1->vartype, "[]");                            
-                          $$->vartype = $1->vartype;
+                          $$->vartype = $1->vartype;        
                           $$->attr.name = $2->attr.name;                        
                           $$->child[0] = $4; }
                     ;
@@ -71,6 +78,7 @@ fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_st
                         { $$ = newStmtNode(FunDeclK);
                           $$->lineno = $2->lineno;  
                           $$->vartype = $1->vartype;
+                          $$->type = $1->type;
                           $$->attr.name = $2->attr.name;
                           $$->child[0] = $4;
                           $$->child[1] = $6; }
@@ -94,10 +102,17 @@ param               : type_specifier identifier
                         { $$ = newExpNode(ParamK);
                           $$->lineno = $2->lineno;   
                           $$->vartype = $1->vartype;
+                          $$->type = $1->type;
                           $$->attr.name = $2->attr.name; }
                     | type_specifier identifier LBRACE RBRACE
                         { $$ = newExpNode(ParamK);
-                          $$->lineno = $2->lineno;   
+                          $$->lineno = $2->lineno;  
+
+                          if (!strcmp($1->vartype, "void"))
+                            $$->type = VoidArray;
+                          else
+                            $$->type = IntegerArray;
+
                           strcat($1->vartype, "[]");
                           $$->vartype = $1->vartype;
                           $$->attr.name = $2->attr.name; }
@@ -274,10 +289,12 @@ number              : NUM { $$ = newExpNode(ConstK);
                     ;
 int                 : INT { $$ = newExpNode(TypeK); 
                             $$->vartype = copyString(tokenString);
+                            $$->type = Integer;
                             $$->lineno = lineno; }
                     ;
 void                : VOID { $$ = newExpNode(TypeK); 
                              $$->vartype = copyString(tokenString);
+                             $$->type = Void;
                              $$->lineno = lineno; }
                     ;
 %%
