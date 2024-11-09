@@ -46,9 +46,11 @@ typedef struct LineListRec
  * it appears in the source code
  */
 typedef struct BucketListRec
-   { char * name;
-     LineList lines;
-     int memloc ; /* memory location for variable */
+   { char * name;    /* name */
+     ExpType type;   /* type */
+     int memloc;     /* memory location for variable */
+     char * scope;   /* scope */
+     LineList lines; /* line numbers */
      struct BucketListRec * next;
    } * BucketList;
 
@@ -60,7 +62,7 @@ static BucketList hashTable[SIZE];
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int loc )
+void st_insert( char * name, ExpType type, int loc, char * scope, int lineno )
 { int h = hash(name);
   BucketList l =  hashTable[h];
   while ((l != NULL) && (strcmp(name,l->name) != 0))
@@ -68,11 +70,13 @@ void st_insert( char * name, int lineno, int loc )
   if (l == NULL) /* variable not yet in table */
   { l = (BucketList) malloc(sizeof(struct BucketListRec));
     l->name = name;
+    l->type = type;
+    l->scope = scope;
     l->lines = (LineList) malloc(sizeof(struct LineListRec));
     l->lines->lineno = lineno;
     l->memloc = loc;
     l->lines->next = NULL;
-    l->next = hashTable[h];
+    l->next = hashTable[h]; /* insert front */
     hashTable[h] = l; }
   else /* found in table, so just add line number */
   { LineList t = l->lines;
