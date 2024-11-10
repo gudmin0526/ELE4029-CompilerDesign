@@ -5,6 +5,23 @@ int x(int y)
       int a;
       int b;
       int c;
+      a = 1;
+      b = 2;
+    }
+    {
+      int a;
+      int b;
+      int c;
+    }
+    {
+      int a;
+      int b;
+      int c;
+    }
+    {
+      int a;
+      int b;
+      int c;
     }
 }
 

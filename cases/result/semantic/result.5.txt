@@ -1,49 +1,50 @@
 
 C-MINUS COMPILATION: cases/test/test.5.txt
 
-Syntax tree:
-  Function Declaration: name = x, return type = int
-    Parameter: name = y, type = int
-    Compound Statement:
-      Return Statement:
-        Op: +
-          Variable: name = y
-          Const: 1
-      Compound Statement:
-        Variable Declaration: name = a, type = int
-        Variable Declaration: name = b, type = int
-        Variable Declaration: name = c, type = int
-  Function Declaration: name = main, return type = int
-    Void Parameter
-    Compound Statement:
-      Variable Declaration: name = a, type = int
-      Variable Declaration: name = b, type = int
-      Variable Declaration: name = c, type = int
-      Compound Statement:
-        Variable Declaration: name = a, type = int
-        Variable Declaration: name = b, type = int
-        Variable Declaration: name = c, type = int
-      Return Statement:
-        Call: function name = x
-          Variable: name = a
-          Variable: name = b
-          Variable: name = c
-
 Building Symbol Table...
+< Scopes >
+Scope Name       Symbol Type      Scope Name       Location    Line Numbers
+---------------  ---------------  ---------------  ----------  -----------------
+global          
+x               
+x.0             
+x.1             
+x.2             
+x.3             
+main            
+main.0          
 
-Symbol table:
-
-Variable Name  Location   Line Numbers
--------------  --------   ------------
-x              0            1 
-a              1            5   13   17 
-b              2            6   14   18 
-c              3            7   15   19 
-main           4           11 
+< Symbol Table >
+Symbol Name       Symbol Kind       Symbol Type      Scope Name       Location    Line Numbers
+----------------  ----------------  ---------------  ---------------  ----------  -----------------
+x                 Function          int               global          0             1 
+main              Function          int               global          14           28 
+y                 Variable          int               x               1             1    3 
+a                 Variable          int               x.0             2             5    8 
+b                 Variable          int               x.0             3             6    9 
+c                 Variable          int               x.0             4             7 
+a                 Variable          int               x.1             5            12 
+b                 Variable          int               x.1             6            13 
+c                 Variable          int               x.1             7            14 
+a                 Variable          int               x.2             8            17 
+b                 Variable          int               x.2             9            18 
+c                 Variable          int               x.2             10           19 
+a                 Variable          int               x.3             11           22 
+b                 Variable          int               x.3             12           23 
+c                 Variable          int               x.3             13           24 
+x                 Function          undetermined      main            21           38 
+a                 Variable          int               main            15           30   38 
+b                 Variable          int               main            16           31   38 
+c                 Variable          int               main            17           32   38 
+a                 Variable          int               main.0          18           34 
+b                 Variable          int               main.0          19           35 
+c                 Variable          int               main.0          20           36 
 
 Checking Types...
 Type error at line 3: Op applied to non-integer
 Type error at line 3: assignment of non-integer value
-Type error at line 21: assignment of non-integer value
+Type error at line 8: assignment of non-integer value
+Type error at line 9: assignment of non-integer value
+Type error at line 38: assignment of non-integer value
 
 Type Checking Finished

@@ -78,6 +78,7 @@ TreeNode * newStmtNode(StmtKind kind)
   else {
     for (i=0;i<MAXCHILDREN;i++) t->child[i] = NULL;
     t->sibling = NULL;
+    t->parent = NULL;
     t->nodekind = StmtK;
     t->kind.stmt = kind;
     t->lineno = lineno;
@@ -97,6 +98,7 @@ TreeNode * newExpNode(ExpKind kind)
   else {
     for (i=0;i<MAXCHILDREN;i++) t->child[i] = NULL;
     t->sibling = NULL;
+    t->parent = NULL;
     t->nodekind = ExpK;
     t->kind.exp = kind;
     t->lineno = lineno;

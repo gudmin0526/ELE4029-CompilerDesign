@@ -1,0 +1,37 @@
+
+C-MINUS COMPILATION: cases/test/test.1.txt
+
+Building Symbol Table...
+< Scopes >
+Scope Name       Symbol Type      Scope Name       Location    Line Numbers
+---------------  ---------------  ---------------  ----------  -----------------
+global          
+gcd             
+main            
+
+< Symbol Table >
+Symbol Name       Symbol Kind       Symbol Type      Scope Name       Location    Line Numbers
+----------------  ----------------  ---------------  ---------------  ----------  -----------------
+gcd               Function          int               global          0             4 
+main              Function          void              global          4            11 
+gcd               Function          undetermined      gcd             3             7 
+u                 Variable          int               gcd             1             4    6    7    7 
+v                 Variable          int               gcd             2             4    6    7    7    7 
+x                 Variable          int               main            5            13   14   15 
+y                 Variable          int               main            6            13   14   15 
+gcd               Function          undetermined      main            9            15 
+output            Function          undetermined      main            8            15 
+input             Function          undetermined      main            7            14   14 
+
+Checking Types...
+Type error at line 6: Op applied to non-integer
+Type error at line 6: assignment of non-integer value
+Type error at line 7: Op applied to non-integer
+Type error at line 7: Op applied to non-integer
+Type error at line 7: Op applied to non-integer
+Type error at line 7: assignment of non-integer value
+Type error at line 6: assignment of non-integer value
+Type error at line 14: assignment of non-integer value
+Type error at line 14: assignment of non-integer value
+
+Type Checking Finished

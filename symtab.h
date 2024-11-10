@@ -20,27 +20,28 @@ void scpl_init();
  */
 void scp_insert( char * name, char * parent );
 
-/* Function sp_lookup returns 1 or
- * -1 if scope name not found
+/* Function sp_lookup returns addr of  
+ * hash table or -1 if scope name not found
  */
-int scp_lookup ( char * name );
+void * scp_lookup ( char * name );
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int loc );
+void st_insert( void ** hashTable, char * name, char * type, char * kind,  char * scpname, int lineno, int loc );
 
 /* Function st_lookup returns the memory 
  * location of a variable or -1 if not found
  */
-int st_lookup ( char * name );
+int st_lookup ( void ** hashTable, char * name );
 
 /* Procedure printSymTab prints a formatted 
  * listing of the symbol table contents 
  * to the listing file
  */
 void printSymTab(FILE * listing);
+void printScpList(FILE * listing);
 
 #endif

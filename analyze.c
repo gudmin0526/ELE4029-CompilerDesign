@@ -74,7 +74,6 @@ static void checkScope(TreeNode * t, int nthChild)
   char nthChildStr[12];
   while (t != NULL) {
     int j=0;
-    printf("scope: %s, %d\n", t->scpname, t->nodekind);
     if (t->nodekind==StmtK)
     { switch (t->kind.stmt) {
         case IfK:
@@ -83,23 +82,32 @@ static void checkScope(TreeNode * t, int nthChild)
         case ReturnK:
         case AssignK:
           while (j < MAXCHILDREN) {
-            if (t->child[j] != NULL) 
+            if (t->child[j] != NULL) {
               strcpy(t->child[j]->scpname, t->scpname);
+              t->child[j]->parent = t;
+            }
             j++;
           }
-          if (t->sibling != NULL)
+          if (t->sibling != NULL) {
             strcpy(t->sibling->scpname, t->scpname);
+            t->sibling->parent = t->parent;
+          }
           nthChild = 0;         
           break;
         case VarDeclK:
         case FunDeclK:          
           while (j < MAXCHILDREN) {
-            if (t->child[j] != NULL) 
+            if (t->child[j] != NULL) {
               strcpy(t->child[j]->scpname, t->attr.name);
+              t->child[j]->parent = t;
+            }
             j++;
           }
-          if (t->sibling != NULL)
+          if (t->sibling != NULL) {
             strcpy(t->sibling->scpname, t->scpname);
+            t->sibling->parent = t->parent;
+          }
+          nthChild = 0;
           break;
         case CmpdK:
           char scpname[MAXLENSCPNAME];
@@ -108,16 +116,18 @@ static void checkScope(TreeNode * t, int nthChild)
             strcat(scpname, ".");
             intToStr(nthChild, nthChildStr);
             strcat(scpname, nthChildStr);
-            printf("is not CHildOfFunDecl\n");
           }
           while (j < MAXCHILDREN) {
-            if (t->child[j] != NULL) 
+            if (t->child[j] != NULL)  {
               strcpy(t->child[j]->scpname, scpname);
+              t->child[j]->parent = t;
+            }
             j++;
           }
           if (t->sibling != NULL) {
-            nthChild++;
             strcpy(t->sibling->scpname, t->scpname);
+            t->sibling->parent = t->parent;
+            nthChild++;
           }
           break; 
           break;
@@ -135,12 +145,16 @@ static void checkScope(TreeNode * t, int nthChild)
         case CallK:
         case TypeK:
           while (j < MAXCHILDREN) {
-            if (t->child[j] != NULL) 
+            if (t->child[j] != NULL) {
               strcpy(t->child[j]->scpname, t->scpname);
+              t->child[j]->parent = t;
+            }
             j++;
           }
-          if (t->sibling != NULL)
+          if (t->sibling != NULL) {
             strcpy(t->sibling->scpname, t->scpname);
+            t->sibling->parent = t->parent;
+          }
           nthChild = 0;
           break;        
         default:
@@ -153,42 +167,38 @@ static void checkScope(TreeNode * t, int nthChild)
   }
 } 
 
-/* Procedure insertScope inserts
- * scope at the scope list
- */
-static void insertScope(TreeNode * t) {
-  switch (t->nodekind)
-  { case StmtK:
-      switch (t->kind.stmt)
-      { case FunDeclK:
-          
-        case VarDeclK:
-        case CmpdK:
-        default:
-          break;
-      }
-  }
-}
-
-
 /* Procedure insertSymbol inserts 
  * identifiers stored in t into 
  * the symbol table 
  */
 static void insertSymbol(TreeNode * t)
-{ switch (t->nodekind)
+{ void * hashTable = scp_lookup(t->scpname);
+  if ((int) hashTable == -1) {
+    /* not yet in scope list, so treat as new scope */
+    scp_insert(t->scpname,t->parent->scpname);
+    hashTable = scp_lookup(t->scpname);
+  }
+
+  switch (t->nodekind)
   { case StmtK:
       switch (t->kind.stmt)
-      { case AssignK:
-        case FunDeclK:
-        case VarDeclK:
-          if (st_lookup(t->attr.name) == -1)
+      { case FunDeclK:
+          if (st_lookup(hashTable,t->attr.name) == -1)
           /* not yet in table, so treat as new definition */
-            st_insert(t->attr.name,t->lineno,location++);
+            st_insert(hashTable,t->attr.name,t->vartype,"Function",t->scpname,t->lineno,location++);
           else
           /* already in table, so ignore location, 
              add line number of use only */ 
-            st_insert(t->attr.name,t->lineno,0);
+            st_insert(hashTable,t->attr.name,t->vartype,"Function",t->scpname,t->lineno,0);
+          break;
+        case VarDeclK:
+          if (st_lookup(hashTable,t->attr.name) == -1)
+          /* not yet in table, so treat as new definition */
+            st_insert(hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
+          else
+          /* already in table, so ignore location, 
+             add line number of use only */ 
+            st_insert(hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
           break;
         default:
           break;
@@ -196,14 +206,38 @@ static void insertSymbol(TreeNode * t)
       break;
     case ExpK:
       switch (t->kind.exp)
-      { case IdK:
-          if (st_lookup(t->attr.name) == -1)
-          /* not yet in table, so treat as new definition */
-            st_insert(t->attr.name,t->lineno,location++);
-          else
-          /* already in table, so ignore location, 
+      { case ParamK:
+          if (t->attr.name == NULL) /* void parameter */
+              break;
+          if (st_lookup(hashTable, t->attr.name) == -1)
+            /* not yet in table, so treat as new definition */
+            st_insert(hashTable, t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
+          else {
+            /* already in table, so ignore location, 
              add line number of use only */ 
-            st_insert(t->attr.name,t->lineno,0);
+            st_insert(hashTable, t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
+          }
+          break;
+        case VarK:
+        case IdK:
+        if (st_lookup(hashTable, t->attr.name) == -1)
+            /* not yet in table, so treat as new definition */
+            st_insert(hashTable, t->attr.name,"undetermined","Variable",t->scpname,t->lineno,location++);
+          else {
+            /* already in table, so ignore location, 
+             add line number of use only */ 
+            st_insert(hashTable, t->attr.name,"undetermined","Variable",t->scpname,t->lineno,0);
+          }
+          break;
+        case CallK:
+          if (st_lookup(hashTable, t->attr.name) == -1)
+            /* not yet in table, so treat as new definition */
+            st_insert(hashTable, t->attr.name,"undetermined","Function",t->scpname,t->lineno,location++);
+          else {
+            /* already in table, so ignore location, 
+             add line number of use only */ 
+            st_insert(hashTable, t->attr.name,"undetermined","Function",t->scpname,t->lineno,0);
+          }
           break;
         default:
           break;
@@ -223,7 +257,8 @@ void buildSymtab(TreeNode * syntaxTree)
   checkScope(syntaxTree, 0);
   traverse(syntaxTree,insertSymbol,nullProc);
   if (TraceAnalyze)
-  { fprintf(listing,"\nSymbol table:\n\n");
+  { 
+    printScpList(listing);
     printSymTab(listing);
   }
 }
