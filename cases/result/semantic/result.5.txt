@@ -1,5 +1,5 @@
 
-C-MINUS COMPILATION: cases/test/test.3.txt
+C-MINUS COMPILATION: cases/test/test.5.txt
 
 Syntax tree:
   Function Declaration: name = x, return type = int
@@ -9,12 +9,20 @@ Syntax tree:
         Op: +
           Variable: name = y
           Const: 1
+      Compound Statement:
+        Variable Declaration: name = a, type = int
+        Variable Declaration: name = b, type = int
+        Variable Declaration: name = c, type = int
   Function Declaration: name = main, return type = int
     Void Parameter
     Compound Statement:
       Variable Declaration: name = a, type = int
       Variable Declaration: name = b, type = int
       Variable Declaration: name = c, type = int
+      Compound Statement:
+        Variable Declaration: name = a, type = int
+        Variable Declaration: name = b, type = int
+        Variable Declaration: name = c, type = int
       Return Statement:
         Call: function name = x
           Variable: name = a
@@ -28,14 +36,14 @@ Symbol table:
 Variable Name  Location   Line Numbers
 -------------  --------   ------------
 x              0            1 
-a              2            8 
-b              3            9 
-c              4           10 
-main           1            6 
+a              1            5   13   17 
+b              2            6   14   18 
+c              3            7   15   19 
+main           4           11 
 
 Checking Types...
 Type error at line 3: Op applied to non-integer
 Type error at line 3: assignment of non-integer value
-Type error at line 12: assignment of non-integer value
+Type error at line 21: assignment of non-integer value
 
 Type Checking Finished

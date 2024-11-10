@@ -13,6 +13,30 @@
 /* counter for variable memory locations */
 static int location = 0;
 
+/* functions for converting int to string */
+void intToStr(int num, char * buffer) {
+    char temp[12];
+    int index = 0;  
+
+    if (num == 0) {
+        temp[index++] = '0';
+    }
+
+    // 숫자를 뒤집힌 순서로 변환
+    while (num > 0) {
+        temp[index++] = (num % 10) + '0';
+        num /= 10;                       
+    }
+
+    temp[index] = '\0';
+
+    // 문자열 뒤집기
+    for (int i = 0; i < index; i++) {
+        buffer[i] = temp[index - i - 1];
+    }
+    buffer[index] = '\0';
+}
+
 /* Procedure traverse is a generic recursive 
  * syntax tree traversal routine:
  * it applies preProc in preorder and postProc 
@@ -22,7 +46,8 @@ static void traverse( TreeNode * t,
                void (* preProc) (TreeNode *),
                void (* postProc) (TreeNode *) )
 { if (t != NULL)
-  { preProc(t);
+  { 
+    preProc(t);
     { int i;
       for (i=0; i < MAXCHILDREN; i++)
         traverse(t->child[i],preProc,postProc);
@@ -41,11 +66,116 @@ static void nullProc(TreeNode * t)
   else return;
 }
 
-/* Procedure insertNode inserts 
+/* Procedure checkScope checks 
+ * the scope of identifiers
+ */
+static void checkScope(TreeNode * t, int nthChild)
+{ int i=0; 
+  char nthChildStr[12];
+  while (t != NULL) {
+    int j=0;
+    printf("scope: %s, %d\n", t->scpname, t->nodekind);
+    if (t->nodekind==StmtK)
+    { switch (t->kind.stmt) {
+        case IfK:
+        case IfElseK:
+        case WhileK:
+        case ReturnK:
+        case AssignK:
+          while (j < MAXCHILDREN) {
+            if (t->child[j] != NULL) 
+              strcpy(t->child[j]->scpname, t->scpname);
+            j++;
+          }
+          if (t->sibling != NULL)
+            strcpy(t->sibling->scpname, t->scpname);
+          nthChild = 0;         
+          break;
+        case VarDeclK:
+        case FunDeclK:          
+          while (j < MAXCHILDREN) {
+            if (t->child[j] != NULL) 
+              strcpy(t->child[j]->scpname, t->attr.name);
+            j++;
+          }
+          if (t->sibling != NULL)
+            strcpy(t->sibling->scpname, t->scpname);
+          break;
+        case CmpdK:
+          char scpname[MAXLENSCPNAME];
+          strcpy(scpname, t->scpname);
+          if (!t->isChildOfFunDecl) { /* funDecl에 속한 compound_stmt가 아닐 경우 */
+            strcat(scpname, ".");
+            intToStr(nthChild, nthChildStr);
+            strcat(scpname, nthChildStr);
+            printf("is not CHildOfFunDecl\n");
+          }
+          while (j < MAXCHILDREN) {
+            if (t->child[j] != NULL) 
+              strcpy(t->child[j]->scpname, scpname);
+            j++;
+          }
+          if (t->sibling != NULL) {
+            nthChild++;
+            strcpy(t->sibling->scpname, t->scpname);
+          }
+          break; 
+          break;
+        default:
+          break;
+      }
+    }
+    else if (t->nodekind==ExpK)
+    { switch (t->kind.exp) { /* exp들은 자체적으로 scope를 가지지 않으므로 부모 것을 상속 */
+        case OpK:
+        case ConstK:
+        case IdK:
+        case ParamK:
+        case VarK:
+        case CallK:
+        case TypeK:
+          while (j < MAXCHILDREN) {
+            if (t->child[j] != NULL) 
+              strcpy(t->child[j]->scpname, t->scpname);
+            j++;
+          }
+          if (t->sibling != NULL)
+            strcpy(t->sibling->scpname, t->scpname);
+          nthChild = 0;
+          break;        
+        default:
+          break;
+      }
+    }
+    for (i=0;i<MAXCHILDREN;i++)
+      checkScope(t->child[i], nthChild);
+    t = t->sibling;
+  }
+} 
+
+/* Procedure insertScope inserts
+ * scope at the scope list
+ */
+static void insertScope(TreeNode * t) {
+  switch (t->nodekind)
+  { case StmtK:
+      switch (t->kind.stmt)
+      { case FunDeclK:
+          
+        case VarDeclK:
+        case CmpdK:
+        default:
+          break;
+      }
+  }
+}
+
+
+/* Procedure insertSymbol inserts 
  * identifiers stored in t into 
  * the symbol table 
  */
-static void insertNode( TreeNode * t)
+static void insertSymbol(TreeNode * t)
 { switch (t->nodekind)
   { case StmtK:
       switch (t->kind.stmt)
@@ -88,7 +218,10 @@ static void insertNode( TreeNode * t)
  * table by preorder traversal of the syntax tree
  */
 void buildSymtab(TreeNode * syntaxTree)
-{ traverse(syntaxTree,insertNode,nullProc);
+{  
+  scpl_init();
+  checkScope(syntaxTree, 0);
+  traverse(syntaxTree,insertSymbol,nullProc);
   if (TraceAnalyze)
   { fprintf(listing,"\nSymbol table:\n\n");
     printSymTab(listing);

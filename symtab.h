@@ -9,8 +9,21 @@
 #ifndef _SYMTAB_H_
 #define _SYMTAB_H_
 
-/* ExpType is used for type checking */
-typedef enum {Void,VoidArray,Integer,IntegerArray} ExpType;
+/* Procedure spl_init initialize
+ * scope list with global scope which
+ * is the first element of scope list
+ */
+void scpl_init();
+
+/* Procedure sp_insert inserts scope
+ * into scope list indentified by name 
+ */
+void scp_insert( char * name, char * parent );
+
+/* Function sp_lookup returns 1 or
+ * -1 if scope name not found
+ */
+int scp_lookup ( char * name );
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table

@@ -14,7 +14,7 @@
 #include "symtab.h"
 
 /* SIZE is the size of the hash table */
-#define SIZE 211
+#define SIZE 30
 
 /* SHIFT is the power of two used as multiplier
    in hash function  */
@@ -47,31 +47,78 @@ typedef struct LineListRec
  */
 typedef struct BucketListRec
    { char * name;    /* name */
-     ExpType type;   /* type */
+     // char * type     /* type */
      int memloc;     /* memory location for variable */
-     char * scope;   /* scope */
      LineList lines; /* line numbers */
      struct BucketListRec * next;
    } * BucketList;
 
+/* The record that stores information for 
+ * each scope, organized as a structure 
+ * containing a hash table
+ */
+typedef struct ScopeListRec
+   { char * name;
+     struct ScopeListRec * next;
+     struct ScopeListRec * parent;
+     BucketList hashTable[SIZE];
+   } * ScopeList;
+
 /* the hash table */
 static BucketList hashTable[SIZE];
+static ScopeList scopeList;
+
+/* initialize global scope which
+ * is the first element of scope list
+*/
+void scpl_init()
+{ 
+  scopeList = (ScopeList) malloc(sizeof(struct ScopeListRec));
+  scopeList->name = "global";
+  scopeList->next = NULL;
+  scopeList->parent = NULL;
+}
+
+/* Procedure sp_insert inserts scope
+ * into scope list indentified by name 
+ */
+void scp_insert( char * name, char * parname )
+{ ScopeList l = scopeList;
+  ScopeList parent = NULL;
+  while ((l->next != NULL)) {
+    l = l->next; /* find the position where new scope be inserted */
+    if (!strcmp(parname, l->next->name)) {}
+  }
+  ScopeList s = (ScopeList) malloc(sizeof(struct ScopeListRec));
+  s->name = name;
+  s->next = NULL;
+  s->parent = parent;
+}
+
+/* Function sp_lookup returns 1 or
+ * -1 if scope name not found
+ */
+int scp_lookup ( char * name )
+{ ScopeList l = scopeList;
+  while ((l != NULL) && (strcmp(name,l->name) != 0))
+    l = l->next;
+  if (l == NULL) return -1;
+  else return 1;
+}
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, ExpType type, int loc, char * scope, int lineno )
+void st_insert( char * name, int lineno, int loc )
 { int h = hash(name);
-  BucketList l =  hashTable[h];
+  BucketList l = hashTable[h];
   while ((l != NULL) && (strcmp(name,l->name) != 0))
     l = l->next;
   if (l == NULL) /* variable not yet in table */
   { l = (BucketList) malloc(sizeof(struct BucketListRec));
     l->name = name;
-    l->type = type;
-    l->scope = scope;
     l->lines = (LineList) malloc(sizeof(struct LineListRec));
     l->lines->lineno = lineno;
     l->memloc = loc;

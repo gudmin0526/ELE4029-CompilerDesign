@@ -63,25 +63,28 @@ extern int lineno; /* source line number for listing */
 /**************************************************/
 
 typedef enum {StmtK,ExpK} NodeKind;
-typedef enum {IfK,IfElseK,WhileK,ReturnK,AssignK,VarDeclK,FunDeclK,CmpdK} StmtKind;
+typedef enum {GlobalK,IfK,IfElseK,WhileK,ReturnK,AssignK,VarDeclK,FunDeclK,CmpdK} StmtKind;
 typedef enum {OpK,TypeK,ConstK,IdK,ParamK,VarK,CallK} ExpKind;
 
 /* ExpType is used for type checking */
 typedef enum {Void,VoidArray,Integer,IntegerArray} ExpType;
 
 #define MAXCHILDREN 3
+#define MAXLENSCPNAME 50
 
 typedef struct treeNode
    { struct treeNode * child[MAXCHILDREN];
      struct treeNode * sibling;
      int lineno;
      NodeKind nodekind;
-     union { StmtKind stmt; ExpKind exp;} kind;
+     union { StmtKind stmt; ExpKind exp; } kind;
      union { TokenType op;
              int val;
              char * name; } attr;
      char * vartype;
-     ExpType type; /* for type checking of exps */
+     char scpname[MAXLENSCPNAME];
+     int isChildOfFunDecl;
+     ExpType type;   /* for type checking of exps */
    } TreeNode;
 
 /**************************************************/

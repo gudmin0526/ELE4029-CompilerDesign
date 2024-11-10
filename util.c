@@ -81,6 +81,7 @@ TreeNode * newStmtNode(StmtKind kind)
     t->nodekind = StmtK;
     t->kind.stmt = kind;
     t->lineno = lineno;
+    t->isChildOfFunDecl = 0;
   }
   return t;
 }

@@ -36,7 +36,7 @@ static int yylex(void); // added 11/2/11 to ensure no conflict with lex
 
 %% /* Grammar for C-MINUS */
 
-program             : declaration_list { savedTree = $1; } 
+program             : declaration_list { savedTree = $1; strcpy(savedTree->scpname, "global"); } 
                     ;
 declaration_list    : declaration_list declaration
                         { YYSTYPE t = $1;
@@ -81,7 +81,8 @@ fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_st
                           $$->type = $1->type;
                           $$->attr.name = $2->attr.name;
                           $$->child[0] = $4;
-                          $$->child[1] = $6; }
+                          $$->child[1] = $6;
+                          $$->child[1]->isChildOfFunDecl = 1; }
                     ;
 params              : param_list { $$ = $1; }
                     | void { $$ = newExpNode(ParamK);
