@@ -20,8 +20,8 @@ void scpl_init();
  */
 void scp_insert( char * name, char * parent );
 
-/* Function sp_lookup returns addr of  
- * hash table or -1 if scope name not found
+/* Function sp_lookup returns l
+ * or NULL if scope name not found
  */
 void * scp_lookup ( char * name );
 

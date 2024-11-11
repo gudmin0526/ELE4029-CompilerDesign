@@ -172,32 +172,25 @@ static void checkScope(TreeNode * t, int nthChild)
  * the symbol table 
  */
 static void insertSymbol(TreeNode * t)
-{ void * hashTable = scp_lookup(t->scpname);
-  if ((int) hashTable == -1) {
-    /* not yet in scope list, so treat as new scope */
+{ /* insert scope if not found */
+  void * s = scp_lookup(t->scpname); 
+  if (l == NULL) {
     scp_insert(t->scpname,t->parent->scpname);
-    hashTable = scp_lookup(t->scpname);
+    s = scp_lookup(t->scpname);
   }
-
+  void * save = s;
+  
   switch (t->nodekind)
   { case StmtK:
       switch (t->kind.stmt)
       { case FunDeclK:
-          if (st_lookup(hashTable,t->attr.name) == -1)
-          /* not yet in table, so treat as new definition */
-            st_insert(hashTable,t->attr.name,t->vartype,"Function",t->scpname,t->lineno,location++);
-          else
-          /* already in table, so ignore location, 
-             add line number of use only */ 
-            st_insert(hashTable,t->attr.name,t->vartype,"Function",t->scpname,t->lineno,0);
+          if (st_lookup(s->hashTable,t->attr.name) == -1) /* already in table -> Error */
+              st_insert()
           break;
         case VarDeclK:
           if (st_lookup(hashTable,t->attr.name) == -1)
-          /* not yet in table, so treat as new definition */
             st_insert(hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
           else
-          /* already in table, so ignore location, 
-             add line number of use only */ 
             st_insert(hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
           break;
         default:

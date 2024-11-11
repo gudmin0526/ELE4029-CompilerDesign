@@ -66,6 +66,26 @@ typedef struct ScopeListRec
      BucketList hashTable[SIZE];
    } * ScopeList;
 
+/* The record in function lists for
+ * each functions, including name,
+ * and its type 
+ */
+typedef struct ParamListRec
+   { char * name;
+     char * type;
+   } * ParamList;
+
+/* The list of global functions
+ * because c-minus only allowed
+ * functions at global scope 
+ */
+typedef struct FunctionListRec
+   { char * name;
+     char * type;
+     ParamList params;
+   } * FunctionList;
+
+
 /* the hash table */
 static ScopeList scopeList;
 
@@ -100,15 +120,14 @@ void scp_insert( char * name, char * parname )
   l->next = s;
 }
 
-/* Function sp_lookup returns addr of  
- * hash table or -1 if scope name not found
+/* Function sp_lookup returns l
+ * or NULL if scope name not found
  */
 void * scp_lookup ( char * name )
-{ ScopeList l = scopeList;
-  while ((l != NULL) && (strcmp(name,l->name) != 0))
-    l = l->next;
-  if (l == NULL) return (void *) -1;
-  else return l->hashTable;
+{ ScopeList s = scopeList;
+  while ((s != NULL) && (strcmp(name,s->name) != 0))
+    s = s->next;
+  return s;
 }
 
 /* Procedure st_insert inserts line numbers and
@@ -159,11 +178,14 @@ void printScpList(FILE * listing)
 { 
   ScopeList s = scopeList;
   fprintf(listing,"< Scopes >\n");
-  fprintf(listing, "Scope Name       Symbol Type      Scope Name       Location    Line Numbers\n");
-  fprintf(listing, "---------------  ---------------  ---------------  ----------  -----------------\n");
+  fprintf(listing, "Scope Name       Parent Scope \n");
+  fprintf(listing, "---------------  ---------------\n");
   while (s != NULL) {
-    fprintf(listing, "%-14s  ", s->name);          
-    fprintf(listing,"\n");
+    fprintf(listing, "%-14s  ", s->name);
+    if (s->parent != NULL)          
+      fprintf(listing, "%-14s  ", s->parent->name);
+    else
+      fprintf(listing, "%-14s  ", "NULL");
     s = s->next;
   }
   fprintf(listing,"\n");
