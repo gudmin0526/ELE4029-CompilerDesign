@@ -65,8 +65,10 @@ var_declaration     : type_specifier identifier SEMI
                           
                           if ($1->type == Void)
                             $$->type = VoidArray;
-                          else
+                          else if ($1->type == Integer)
                             $$->type = IntegerArray;
+                          else
+                            $$->type = Undetermined;
         
                           strcat($1->vartype, "[]");                            
                           $$->vartype = $1->vartype;        
@@ -114,8 +116,10 @@ param               : type_specifier identifier
 
                           if ($1->type == Void)
                             $$->type = VoidArray;
-                          else
+                          else if ($1->type == Integer)
                             $$->type = IntegerArray;
+                          else
+                            $$->type = Undetermined;
 
                           strcat($1->vartype, "[]");
                           $$->vartype = $1->vartype;
@@ -167,7 +171,9 @@ selection_stmt      : IF LPAREN expression RPAREN statement %prec LOWER_THAN_ELS
                         { $$ = newStmtNode(IfElseK);
                           $$->lineno = lineno;
                           if ($5->type == $7->type)
-                            $$->type = $5->type;                        
+                            $$->type = $5->type;          
+                          else
+                            $$->type = Undetermined;              
                           $$->child[0] = $3;
                           $$->child[1] = $5;
                           $$->child[2] = $7; }
@@ -194,24 +200,23 @@ expression          : var assignop expression
                           $$->lineno = lineno;
                           $$->child[0] = $1;
                           $$->child[1] = $3;
-                          if ($1->type == IntegerArray && $3->type == IntegerArray)
-                            $$->type = IntegerArray;
-                          else if ($1->type == Integer && $3->type == Integer)
-                            $$->type = Integer;
+                          if ($1->type == $3->type)
+                            $$->type = $1->type;
                           else
-                            $$->type = Void;
+                            $$->type = Undetermined;
+              
                           $$->attr.op = $2->attr.op; }
                     | simple_expression { $$ = $1; }
                     ;
 var                 : identifier 
                         { $$ = newExpNode(VarK);
                           $$->lineno = $1->lineno;
-                          $$->type = Integer;
+                          $$->type = Undetermined;
                           $$->attr.name = $1->attr.name; }
                     | identifier LBRACE expression RBRACE
                         { $$ = newExpNode(VarK);
                           $$->lineno = $1->lineno;
-                          $$->type = IntegerArray;
+                          $$->type = Undetermined;
                           $$->attr.name = $1->attr.name;
                           $$->child[0] = $3; }
                     ;
@@ -223,7 +228,7 @@ simple_expression   : additive_expression relop additive_expression
                           if ($1->type == Integer && $3->type == Integer)
                             $$->type = Integer;
                           else
-                            $$->type = Void;
+                            $$->type = Undetermined;
                           $$->attr.op = $2->attr.op; }
                     | additive_expression { $$ = $1; }
                     ;
@@ -257,7 +262,7 @@ additive_expression : additive_expression addop term
                           if ($1->type == Integer && $3->type == Integer)
                             $$->type = Integer;
                           else
-                            $$->type = Void;
+                            $$->type = Undetermined;
                           $$->attr.op = $2->attr.op; }
                     | term { $$ = $1; }
                     ;
@@ -272,6 +277,10 @@ term                : term mulop factor
                         { $$ = $2;
                           $$->child[0] = $1;
                           $$->child[1] = $3; 
+                          if ($1->type == Integer && $3->type == Integer)
+                            $$->type = Integer;
+                          else
+                            $$->type = Undetermined;
                           $$->attr.op = $2->attr.op; }
                     | factor { $$ = $1; }
                     ;
@@ -289,7 +298,8 @@ factor              : LPAREN expression RPAREN { $$ = $2; }
                     ;
 call                : identifier LPAREN args RPAREN
                         { $$ = newExpNode(CallK);
-                          $$->lineno = $1->lineno;                        
+                          $$->lineno = $1->lineno;
+                          $$->type = Undetermined;                        
                           $$->attr.name = $1->attr.name;
                           $$->child[0] = $3; }
                     ;
@@ -308,6 +318,7 @@ arg_list            : arg_list COMMA expression
                     ;
 identifier          : ID { $$ = newExpNode(IdK);
                            $$->attr.name = copyString(tokenString);
+                           $$->type = Undetermined;
                            $$->lineno = lineno; }
                     ;
 number              : NUM { $$ = newExpNode(ConstK);

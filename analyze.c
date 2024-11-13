@@ -15,27 +15,36 @@ static int location = 3;
 
 /* functions for converting int to string */
 static void intToStr(int num, char * buffer) 
-{
-    char temp[12];
-    int index = 0;  
+{ char temp[12];
+  int index = 0;  
 
-    if (num == 0) {
-        temp[index++] = '0';
-    }
+  if (num == 0) {
+      temp[index++] = '0';
+  }
 
-    // 숫자를 뒤집힌 순서로 변환
-    while (num > 0) {
-        temp[index++] = (num % 10) + '0';
-        num /= 10;                       
-    }
+  // 숫자를 뒤집힌 순서로 변환
+  while (num > 0) {
+      temp[index++] = (num % 10) + '0';
+      num /= 10;                       
+  }
 
-    temp[index] = '\0';
+  temp[index] = '\0';
 
-    // 문자열 뒤집기
-    for (int i = 0; i < index; i++) {
-        buffer[i] = temp[index - i - 1];
-    }
-    buffer[index] = '\0';
+  // 문자열 뒤집기
+  for (int i = 0; i < index; i++) {
+      buffer[i] = temp[index - i - 1];
+  }
+  buffer[index] = '\0';
+}
+
+/* functions for checking what it returns from */
+static char * returnWhatFunctionIsItIn(char * scpname, char * buffer)
+{ int i = 0;
+  while (scpname[i] != '\0' && scpname[i] != '.') {
+    buffer[i] = scpname[i];
+    i++;
+  }
+  buffer[i] = '\0';
 }
 
 /* Procedure traverse is a generic recursive 
@@ -302,8 +311,7 @@ static void insertSymbol(TreeNode * t)
  * table by preorder traversal of the syntax tree
  */
 void buildSymtab(TreeNode * syntaxTree)
-{  
-  sl_fl_init();
+{ sl_fl_init();
   checkScope(syntaxTree, 0);
   traverse(syntaxTree,insertSymbol,nullProc);
   if (TraceAnalyze)
@@ -316,7 +324,6 @@ void buildSymtab(TreeNode * syntaxTree)
 
 /* Function isTypeInteger checks if symbol's 
  * type is integer. if not, return 0 
- * if kind is invalid, return -1 
  */
 static int isTypeInteger(TreeNode * t) 
 { if (t->kind.exp == ConstK) 
@@ -324,18 +331,25 @@ static int isTypeInteger(TreeNode * t)
   else if (t->kind.exp == VarK || t->kind.exp == CallK) {
     BucketList bl = find_symbol(t->attr.name, t->scpname); /* symtab에 존재하는지 확인 */
     return bl && strcmp(bl->type, "int") == 0;
+  } else {
+    if (t->type == Integer)
+      return 1;
+    return 0;
   }
   return -1;
 }
 
 /* Function isTypeIntegerArray checks if symbol's 
  * type is integer array. if not, return 0 
- * if kind is invalid, return -1 
  */
 static int isTypeIntegerArray(TreeNode * t) 
 { if (t->kind.exp == VarK || t->kind.exp == CallK) {
     BucketList bl = find_symbol(t->attr.name, t->scpname); /* symtab에 존재하는지 확인 */
     return bl && strcmp(bl->type, "int[]") == 0;
+  } else {
+    if (t->type == IntegerArray)
+      return 1;
+    return 0;
   }
   return -1;
 }
@@ -345,7 +359,14 @@ static int isTypeIntegerArray(TreeNode * t)
  */
 static int isTypeVoidKind(TreeNode * t) 
 { BucketList bl = find_symbol(t->attr.name, t->scpname);
-  return bl && (strcmp(bl->type, "void") == 0 || strcmp(bl->type, "void[]") == 0);
+  if (t->kind.exp == VarK || t->kind.exp == CallK || t->kind.exp == CallK)
+    return bl && (strcmp(bl->type, "void") == 0 || strcmp(bl->type, "void[]") == 0);
+  else {
+    if (t->type == Void || t->type == VoidArray)
+      return 1;
+    return 0;
+  }
+  return -1;
 }
 
 /* Procedure checkNode performs
@@ -359,7 +380,12 @@ static void checkNode(TreeNode * t)
         { TreeNode * c0 = t->child[0];
           TreeNode * c1 = t->child[1];
           if (!isTypeInteger(c0) || !isTypeInteger(c1))
-            fprintf(listing, "Error: invalid operation at line %d\n", c0->lineno);
+            fprintf(listing, "Error: invalid operation at line %d\n", c0->lineno);   
+          else {
+            c0->type = Integer;
+            c1->type = Integer;
+            t->type = Integer;
+          }
           break;
         }
         case ParamK:
@@ -427,17 +453,43 @@ static void checkNode(TreeNode * t)
           break;
         case IfElseK:
         /* NEED TO IMPLEMENT */
+          break;
         case WhileK:
         /* NEED TO IMPLEMENT */
+          break;
         case ReturnK:
-        /* NEED TO IMPLEMENT */
+        { char f_name[MAXLENSCPNAME];
+          returnWhatFunctionIsItIn(t->scpname, f_name);
+          FunctionList fl = fn_lookup(f_name);
+          TreeNode * c = t->child[0];
+
+          if (c == NULL && strcmp(fl->type, "void") != 0) {  
+            fprintf(listing, "Error: Invalid return at line %d\n", t->lineno);
+            break;
+          } else if (c != NULL && (!isTypeInteger(c) || strcmp(fl->type, "int") != 0)) {
+            fprintf(listing, "Error: Invalid return at line %d\n", t->lineno);
+            break;
+          }
+          break;
+        }
         case AssignK:
-          //if (t->child[0]->type != Integer)
-            //typeError(t->child[0],"assignment of non-integer value");
+        { TreeNode * c0 = t->child[0];
+          TreeNode * c1 = t->child[1];
+          if (c0 == NULL || c1 == NULL) {
+            fprintf(listing, "Error: invalid assignment at line %d\n", t->lineno);
+            break;
+          }
+          if (!((isTypeInteger(c0) && isTypeInteger(c1)) || (isTypeIntegerArray(c0) && isTypeIntegerArray(c1)))) {
+            fprintf(listing, "Error: invalid assignment at line %d\n", t->lineno);
+            break;
+          }
+          break;
+        }
         case VarDeclK:
           break;
         case FunDeclK:
         /* NEED TO IMPLEMENT */
+          break;
         case CmpdK:
         /* NEED TO IMPLEMENT */
           break;
