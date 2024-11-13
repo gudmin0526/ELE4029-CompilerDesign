@@ -90,7 +90,7 @@ fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_st
                     ;
 params              : param_list { $$ = $1; }
                     | void { $$ = newExpNode(ParamK);
-                             $$->lineno = lineno;
+                             $$->lineno = $1->lineno;
                              $$->type = Void;
                              $$->vartype = NULL; }
                     ;
@@ -197,7 +197,7 @@ return_stmt         : RETURN SEMI
                     ;
 expression          : var assignop expression 
                         { $$ = newStmtNode(AssignK);
-                          $$->lineno = lineno;
+                          $$->lineno = $1->lineno;
                           $$->child[0] = $1;
                           $$->child[1] = $3;
                           if ($1->type == $3->type)
@@ -222,7 +222,7 @@ var                 : identifier
                     ;
 simple_expression   : additive_expression relop additive_expression
                         { $$ = newExpNode(OpK); 
-                          $$->lineno = lineno;
+                          $$->lineno = $1->lineno;
                           $$->child[0] = $1;
                           $$->child[1] = $3;
                           if ($1->type == Integer && $3->type == Integer)
@@ -256,7 +256,7 @@ relop               : LE { $$ = newExpNode(OpK);
                     ;
 additive_expression : additive_expression addop term 
                         { $$ = newExpNode(OpK); 
-                          $$->lineno = lineno;                    
+                          $$->lineno = $1->lineno;                    
                           $$->child[0] = $1;
                           $$->child[1] = $3;
                           if ($1->type == Integer && $3->type == Integer)
@@ -277,6 +277,7 @@ term                : term mulop factor
                         { $$ = $2;
                           $$->child[0] = $1;
                           $$->child[1] = $3; 
+                          $$->lineno = $1->lineno;
                           if ($1->type == Integer && $3->type == Integer)
                             $$->type = Integer;
                           else

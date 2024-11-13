@@ -38,7 +38,7 @@ static void intToStr(int num, char * buffer)
 }
 
 /* functions for checking what it returns from */
-static char * returnWhatFunctionIsItIn(char * scpname, char * buffer)
+static void returnWhatFunctionIsItIn(char * scpname, char * buffer)
 { int i = 0;
   while (scpname[i] != '\0' && scpname[i] != '.') {
     buffer[i] = scpname[i];
@@ -448,15 +448,15 @@ static void checkNode(TreeNode * t)
     case StmtK:
       switch (t->kind.stmt)
       { case IfK:
-          // if (t->child[0]->type == Integer)
-          //   typeError(t->child[0],"if test is not Boolean");
-          break;
         case IfElseK:
-        /* NEED TO IMPLEMENT */
-          break;
         case WhileK:
-        /* NEED TO IMPLEMENT */
+        { TreeNode * c = t->child[0];
+          if (c == NULL || !isTypeInteger(c)) {
+            fprintf(listing, "Error: invalid condition at line %d\n", t->lineno);
+            break;
+          }
           break;
+        }
         case ReturnK:
         { char f_name[MAXLENSCPNAME];
           returnWhatFunctionIsItIn(t->scpname, f_name);
@@ -485,14 +485,6 @@ static void checkNode(TreeNode * t)
           }
           break;
         }
-        case VarDeclK:
-          break;
-        case FunDeclK:
-        /* NEED TO IMPLEMENT */
-          break;
-        case CmpdK:
-        /* NEED TO IMPLEMENT */
-          break;
         default:
           break;
       }
