@@ -11,10 +11,11 @@
 #include "analyze.h"
 
 /* counter for variable memory locations */
-static int location = 0;
+static int location = 3;
 
 /* functions for converting int to string */
-void intToStr(int num, char * buffer) {
+static void intToStr(int num, char * buffer) 
+{
     char temp[12];
     int index = 0;  
 
@@ -95,6 +96,19 @@ static void checkScope(TreeNode * t, int nthChild)
           nthChild = 0;         
           break;
         case VarDeclK:
+          while (j < MAXCHILDREN) {
+            if (t->child[j] != NULL) {
+              strcpy(t->child[j]->scpname, t->scpname);
+              t->child[j]->parent = t;
+            }
+            j++;
+          }
+          if (t->sibling != NULL) {
+            strcpy(t->sibling->scpname, t->scpname);
+            t->sibling->parent = t->parent;
+          }
+          nthChild = 0;
+          break;
         case FunDeclK:          
           while (j < MAXCHILDREN) {
             if (t->child[j] != NULL) {
@@ -129,7 +143,6 @@ static void checkScope(TreeNode * t, int nthChild)
             t->sibling->parent = t->parent;
             nthChild++;
           }
-          break; 
           break;
         default:
           break;
@@ -173,65 +186,109 @@ static void checkScope(TreeNode * t, int nthChild)
  */
 static void insertSymbol(TreeNode * t)
 { /* insert scope if not found */
-  void * s = scp_lookup(t->scpname); 
-  if (l == NULL) {
+  ScopeList s = scp_lookup(t->scpname); 
+  if (s == NULL) {
     scp_insert(t->scpname,t->parent->scpname);
     s = scp_lookup(t->scpname);
   }
-  void * save = s;
-  
+
+  ScopeList save = s; /* for returing to the original scope, when not found at upper scopes */
+
   switch (t->nodekind)
   { case StmtK:
       switch (t->kind.stmt)
       { case FunDeclK:
-          if (st_lookup(s->hashTable,t->attr.name) == -1) /* already in table -> Error */
-              st_insert()
+        { BucketList bl = st_lookup(s->hashTable,t->attr.name);
+          if (bl != NULL) {/* 다른 스코프에서 선언된건 알빠 아님 */
+            fprintf(listing, "Error: Symbol \"%s\" is redefined at line %d (already defined at line", t->attr.name, t->lineno);
+            // Program to sequentially print all the line numbers
+            LineList ll = bl->lines;
+            while (ll != NULL) {
+              fprintf(listing, " %d", ll->lineno);
+              ll = ll->next;
+            }
+            fprintf(listing, ")\n");
+            st_insert(s->hashTable,t->attr.name,t->vartype,"Function",t->scpname,t->lineno,0);
+          }
+          else {
+            st_insert(s->hashTable,t->attr.name,t->vartype,"Function",t->scpname,t->lineno,location++);
+            fn_insert(t->attr.name,t->vartype,NULL,NULL); /* 당장 param에 대한 정보는 없음 */
+          }
           break;
+        }
         case VarDeclK:
-          if (st_lookup(hashTable,t->attr.name) == -1)
-            st_insert(hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
+        { BucketList bl = st_lookup(s->hashTable,t->attr.name);
+          if (bl != NULL) {/* 다른 스코프에서 선언된건 알빠 아님 */
+            fprintf(listing, "Error: Symbol \"%s\" is redefined at line %d (already defined at line", t->attr.name, t->lineno);
+            // Program to sequentially print all the line numbers
+            LineList ll = bl->lines;
+            while (ll != NULL) {
+              fprintf(listing, " %d", ll->lineno);
+              ll = ll->next;
+            }
+            fprintf(listing, ")\n");
+            st_insert(s->hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
+          }
           else
-            st_insert(hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
+            st_insert(s->hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
           break;
+        }
         default:
           break;
       }
       break;
     case ExpK:
       switch (t->kind.exp)
-      { case ParamK:
-          if (t->attr.name == NULL) /* void parameter */
-              break;
-          if (st_lookup(hashTable, t->attr.name) == -1)
-            /* not yet in table, so treat as new definition */
-            st_insert(hashTable, t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
+      { case ParamK: /* 마찬가지로 자기 scope만 신경쓰면 된다 */
+        { if (t->vartype == NULL)
+            break;
+          BucketList bl = st_lookup(s->hashTable,t->attr.name);
+          if (bl != NULL) {/* 다른 스코프에서 선언된건 알빠 아님 */
+            fprintf(listing, "Error: Symbol \"%s\" is redefined at line %d (already defined at line", t->attr.name, t->lineno);
+            // Program to sequentially print all the line numbers
+            LineList ll = bl->lines;
+            while (ll != NULL) {
+              fprintf(listing, " %d", ll->lineno);
+              ll = ll->next;
+            }
+            fprintf(listing, ")\n");
+            st_insert(s->hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
+          }
           else {
-            /* already in table, so ignore location, 
-             add line number of use only */ 
-            st_insert(hashTable, t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
+            st_insert(s->hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
+            fn_insert(t->scpname,NULL,t->attr.name,t->vartype); /* function overloading 안되므로 type 몰라도 된다 */
           }
           break;
+        }
         case VarK:
-        case IdK:
-        if (st_lookup(hashTable, t->attr.name) == -1)
-            /* not yet in table, so treat as new definition */
-            st_insert(hashTable, t->attr.name,"undetermined","Variable",t->scpname,t->lineno,location++);
-          else {
-            /* already in table, so ignore location, 
-             add line number of use only */ 
-            st_insert(hashTable, t->attr.name,"undetermined","Variable",t->scpname,t->lineno,0);
+        { while (s != NULL) { /* not found in symbol table at this scope */
+            if (st_lookup(s->hashTable,t->attr.name) != NULL) { /* already in symbol table */ 
+              st_insert(s->hashTable, t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
+              break;
+            }
+            s = s->parent; /* search at parent scope */
+          }
+          if (s == NULL) { /* NOT FOUND IN ANY SCOPE -> Error */
+            st_insert(save->hashTable, t->attr.name,"undetermined","Variable",t->scpname,t->lineno,location++);
+            fprintf(listing, "Error: undeclared variable \"%s\" is used at line %d\n", t->attr.name, t->lineno);
           }
           break;
+        }
         case CallK:
-          if (st_lookup(hashTable, t->attr.name) == -1)
-            /* not yet in table, so treat as new definition */
-            st_insert(hashTable, t->attr.name,"undetermined","Function",t->scpname,t->lineno,location++);
-          else {
-            /* already in table, so ignore location, 
-             add line number of use only */ 
-            st_insert(hashTable, t->attr.name,"undetermined","Function",t->scpname,t->lineno,0);
+        { while (s != NULL) { /* not found in symbol table at this scope */
+            if (st_lookup(s->hashTable,t->attr.name) != NULL) { /* already in symbol table */
+              st_insert(s->hashTable, t->attr.name,t->vartype,"Function",t->scpname,t->lineno,0);
+              break;
+            }
+            s = s->parent; /* search at parent scope */
+          }
+          if (s == NULL) { /* not found in any scope -> Error */
+            st_insert(save->hashTable, t->attr.name,"undetermined","Function",t->scpname,t->lineno,location++);
+            fn_insert(t->attr.name,"undetermined",NULL,NULL);
+            fprintf(listing, "Error: undeclared function \"%s\" is used at line %d\n", t->attr.name, t->lineno);
           }
           break;
+        }
         default:
           break;
       }
@@ -246,19 +303,49 @@ static void insertSymbol(TreeNode * t)
  */
 void buildSymtab(TreeNode * syntaxTree)
 {  
-  scpl_init();
+  sl_fl_init();
   checkScope(syntaxTree, 0);
   traverse(syntaxTree,insertSymbol,nullProc);
   if (TraceAnalyze)
   { 
+    printFuncList(listing);
     printScpList(listing);
     printSymTab(listing);
   }
 }
 
-static void typeError(TreeNode * t, char * message)
-{ fprintf(listing,"Type error at line %d: %s\n",t->lineno,message);
-  Error = TRUE;
+/* Function isTypeInteger checks if symbol's 
+ * type is integer. if not, return 0 
+ * if kind is invalid, return -1 
+ */
+static int isTypeInteger(TreeNode * t) 
+{ if (t->kind.exp == ConstK) 
+    return t->type == Integer;
+  else if (t->kind.exp == VarK || t->kind.exp == CallK) {
+    BucketList bl = find_symbol(t->attr.name, t->scpname); /* symtab에 존재하는지 확인 */
+    return bl && strcmp(bl->type, "int") == 0;
+  }
+  return -1;
+}
+
+/* Function isTypeIntegerArray checks if symbol's 
+ * type is integer array. if not, return 0 
+ * if kind is invalid, return -1 
+ */
+static int isTypeIntegerArray(TreeNode * t) 
+{ if (t->kind.exp == VarK || t->kind.exp == CallK) {
+    BucketList bl = find_symbol(t->attr.name, t->scpname); /* symtab에 존재하는지 확인 */
+    return bl && strcmp(bl->type, "int[]") == 0;
+  }
+  return -1;
+}
+
+/* Function isTypeVoidKind checks if
+ * symbol's type is void kind 
+ */
+static int isTypeVoidKind(TreeNode * t) 
+{ BucketList bl = find_symbol(t->attr.name, t->scpname);
+  return bl && (strcmp(bl->type, "void") == 0 || strcmp(bl->type, "void[]") == 0);
 }
 
 /* Procedure checkNode performs
@@ -267,25 +354,67 @@ static void typeError(TreeNode * t, char * message)
 static void checkNode(TreeNode * t)
 { switch (t->nodekind)
   { case ExpK:
-      switch (t->kind.exp)
-      { case OpK:
-          if ((t->child[0]->type != Integer) ||
-              (t->child[1]->type != Integer))
-            typeError(t,"Op applied to non-integer");
+      switch (t->kind.exp) {
+      case OpK:
+        { TreeNode * c0 = t->child[0];
+          TreeNode * c1 = t->child[1];
+          if (!isTypeInteger(c0) || !isTypeInteger(c1))
+            fprintf(listing, "Error: invalid operation at line %d\n", c0->lineno);
           break;
-        case TypeK:
-        /* NEED TO IMPLEMENT */
-        case ConstK:
-        /* NEED TO IMPLEMENT */ 
-        case IdK:
-          t->type = Integer;
-          break;
+        }
         case ParamK:
-        /* NEED TO IMPLEMENT */
+        { if (t->vartype == NULL) /* void parameter -> do nothing */
+            break;
+          if (isTypeVoidKind(t)) { /* void type variable -> Error */
+            fprintf(listing, "Error: The void-type variable is declared at line %d (name : \"%s\")\n", t->lineno, t->attr.name);
+            break;
+          }
+          break;
+        }
         case VarK:
-        /* NEED TO IMPLEMENT */
+        { if (isTypeVoidKind(t)) { /* void type variable -> Error */
+            fprintf(listing, "Error: The void-type variable is declared at line %d (name : \"%s\")\n", t->lineno, t->attr.name);
+            break;
+          }
+          if (isTypeIntegerArray(t) && t->child[0] != NULL && !isTypeInteger(t->child[0])) 
+            fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indicies should be integer\n", t->lineno, t->attr.name);
+          else if (!isTypeIntegerArray(t) && t->child[0] != NULL) /* array가 아닌데 자식이 있으면 안된다 */
+            fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indexing can only allowed for int[] variables\n", t->lineno, t->attr.name);    
+          break;
+        }
         case CallK:
-        /* NEED TO IMPLEMENT */
+        { BucketList bl = find_symbol(t->attr.name, t->scpname);
+          if (bl == NULL) {/* symbol table에 존재하는지 확인 */
+            fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+            break;
+          }
+          if (!strcmp(bl->type, "undetermined")) { /* invalid function call */
+            fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+            break;
+          }
+
+          int numArgs = 0;
+          FunctionList fl = fn_lookup(t->attr.name);
+          ParamList p = fl->params;
+          TreeNode * c = t->child[0]; /* args에 대한 type checking */
+    
+          while (c != NULL) {
+            if (p == NULL) { /* params와 args의 길이가 안맞는 경우 */
+              fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+              return;
+            }
+            if (!((isTypeInteger(c) && !strcmp(p->type, "int")) || (isTypeIntegerArray(c) && !strcmp(p->type, "int")))) {
+              fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+              return;
+            } /* params와 args의 타입이 불일치하는 경우 or Void 타입을 가진 경우 */
+            numArgs++;
+            p = p->next;
+            c = c->sibling;
+          }
+          if (numArgs != fl->numParams) 
+            fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+          break;
+        }
         default:
           break;
       }
@@ -293,8 +422,8 @@ static void checkNode(TreeNode * t)
     case StmtK:
       switch (t->kind.stmt)
       { case IfK:
-          if (t->child[0]->type == Integer)
-            typeError(t->child[0],"if test is not Boolean");
+          // if (t->child[0]->type == Integer)
+          //   typeError(t->child[0],"if test is not Boolean");
           break;
         case IfElseK:
         /* NEED TO IMPLEMENT */
@@ -303,15 +432,14 @@ static void checkNode(TreeNode * t)
         case ReturnK:
         /* NEED TO IMPLEMENT */
         case AssignK:
-          if (t->child[0]->type != Integer)
-            typeError(t->child[0],"assignment of non-integer value");
+          //if (t->child[0]->type != Integer)
+            //typeError(t->child[0],"assignment of non-integer value");
         case VarDeclK:
-        /* NEED TO IMPLEMENT */
+          break;
         case FunDeclK:
         /* NEED TO IMPLEMENT */
         case CmpdK:
         /* NEED TO IMPLEMENT */
-          break;
           break;
         default:
           break;

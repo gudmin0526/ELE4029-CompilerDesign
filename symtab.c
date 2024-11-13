@@ -13,98 +13,67 @@
 #include <string.h>
 #include "symtab.h"
 
-/* SIZE is the size of the hash table */
-#define SIZE 30
-
-/* SHIFT is the power of two used as multiplier
-   in hash function  */
-#define SHIFT 4
-
 /* the hash function */
 static int hash ( char * key )
 { int temp = 0;
   int i = 0;
   while (key[i] != '\0')
-  { temp = ((temp << SHIFT) + key[i]) % SIZE;
+  { temp = ((temp << SHIFT) + key[i]) % TABLESIZE;
     ++i;
   }
   return temp;
 }
 
-/* the list of line numbers of the source 
- * code in which a variable is referenced
- */
-typedef struct LineListRec
-   { int lineno;
-     struct LineListRec * next;
-   } * LineList;
-
-/* The record in the bucket lists for
- * each variable, including name, 
- * assigned memory location, and
- * the list of line numbers in which
- * it appears in the source code
- */
-typedef struct BucketListRec
-   { char * name;    /* name */
-     char * scpname; /* scope name */
-     char * type;    /* type */
-     char * kind;    /* kind */
-     int memloc;     /* memory location for variable */
-     LineList lines; /* line numbers */
-     struct BucketListRec * next;
-   } * BucketList;
-
-/* The record that stores information for 
- * each scope, organized as a structure 
- * containing a hash table
- */
-typedef struct ScopeListRec
-   { char * name;
-     struct ScopeListRec * next;
-     struct ScopeListRec * parent;
-     BucketList hashTable[SIZE];
-   } * ScopeList;
-
-/* The record in function lists for
- * each functions, including name,
- * and its type 
- */
-typedef struct ParamListRec
-   { char * name;
-     char * type;
-   } * ParamList;
-
-/* The list of global functions
- * because c-minus only allowed
- * functions at global scope 
- */
-typedef struct FunctionListRec
-   { char * name;
-     char * type;
-     ParamList params;
-   } * FunctionList;
-
-
 /* the hash table */
-static ScopeList scopeList;
+static ScopeList sl;
+static FunctionList fl;
 
-/* initialize global scope which
- * is the first element of scope list
-*/
-void scpl_init()
-{ 
-  scopeList = (ScopeList) malloc(sizeof(struct ScopeListRec));
-  scopeList->name = "global";
-  scopeList->next = NULL;
-  scopeList->parent = NULL;
+/* initialize scope list and
+ * function list
+ */
+void sl_fl_init()
+{ /* init for global scope */
+  sl = (ScopeList) malloc(sizeof(struct ScopeListRec));
+  sl->name = "global";
+  sl->next = NULL;
+  sl->parent = NULL;
+
+  /* inserts built-in input, output into symbol table */
+  st_insert(sl->hashTable,"input","int","Function","global",0,0);
+  st_insert(sl->hashTable,"output","void","Function","global",0,1);
+  scp_insert("input","global");
+  scp_insert("output","global");
+  ScopeList s_output = scp_lookup("output");
+  st_insert(s_output->hashTable,"value","int","Variable","output",0,2);
+
+  /* init for built-in input function */
+  fl = (FunctionList) malloc(sizeof(struct FunctionListRec));
+  fl->name = "input";
+  fl->type = "int";
+  fl->numParams = 0;
+  fl->params = NULL;
+
+  /* init for built-in output function */
+  FunctionList f = (FunctionList) malloc(sizeof(struct FunctionListRec));
+  f->name = "output";
+  f->type = "void";
+  f->numParams = 1;
+  f->next = NULL;
+
+  ParamList p = (ParamList) malloc(sizeof(struct ParamListRec));
+  p->name = "value";
+  p->next = NULL;
+  p->type = "int";
+  f->params = p;
+
+  fl->next = f;
 }
 
-/* Procedure sp_insert inserts scope
+/* Procedure scp_insert inserts scope
  * into scope list indentified by name 
  */
 void scp_insert( char * name, char * parname )
-{ ScopeList l = scopeList;
+{ ScopeList l = sl;
   ScopeList parent = NULL;
   
   while ((l->next != NULL)) {
@@ -120,14 +89,61 @@ void scp_insert( char * name, char * parname )
   l->next = s;
 }
 
-/* Function sp_lookup returns l
+/* Function scp_lookup returns l
  * or NULL if scope name not found
  */
-void * scp_lookup ( char * name )
-{ ScopeList s = scopeList;
+ScopeList scp_lookup ( char * name )
+{ ScopeList s = sl;
   while ((s != NULL) && (strcmp(name,s->name) != 0))
     s = s->next;
   return s;
+}
+
+/* Procedure fn_insert inserts functions and
+ * Params into function list 
+ */
+void fn_insert ( char * name, char * type, char * paramName, char * paramType )
+{ FunctionList f = fl;
+  while ((f->next != NULL) && (strcmp(name,f->name) != 0))
+    f = f->next;
+  if (strcmp(name,f->name) != 0) /* function not in list */
+  { FunctionList nf = (FunctionList) malloc(sizeof(struct FunctionListRec));
+    nf->name = name;
+    nf->type = type;
+    nf->numParams = 0;
+    nf->next = NULL;
+    nf->params = NULL;
+
+    f->next = nf;
+  }
+  else /* if exists, append param to the left */
+  { ParamList p = (ParamList) malloc(sizeof(struct ParamListRec));
+    p->name = paramName;
+    p->type = paramType;
+    p->next = NULL;
+    f->numParams++;
+    ParamList temp = f->params;
+    if (temp == NULL)
+      f->params = p;
+    else {
+      while (temp->next != NULL)
+        temp = temp->next;
+      temp->next = p; 
+    }
+  }
+}
+
+/* Function fn_lookup returns 
+ * number of parameters or -1 if not exists
+ */
+FunctionList fn_lookup(char * name) 
+{ FunctionList f = fl;
+  while ((f->next != NULL) && (strcmp(name,f->name) != 0))
+    f = f->next;
+  if (strcmp(name,f->name) == 0) /* function is in the list */
+    return f;
+  else
+    return NULL;
 }
 
 /* Procedure st_insert inserts line numbers and
@@ -135,7 +151,7 @@ void * scp_lookup ( char * name )
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( void ** hashTable, char * name, char * type, 
+void st_insert( BucketList * hashTable, char * name, char * type, 
                 char * kind, char * scpname, int lineno, int loc )
 { int h = hash(name);
   BucketList l = hashTable[h];
@@ -160,26 +176,64 @@ void st_insert( void ** hashTable, char * name, char * type,
     t->next->lineno = lineno;
     t->next->next = NULL;
   }
-} /* st_insert */
+}
 
-/* Function st_lookup returns the memory 
- * location of a variable or -1 if not found
+/* Function st_lookup returns the BucketlList 
+ * or NULL if not found
  */
-int st_lookup ( void ** hashTable, char * name )
+BucketList st_lookup ( BucketList * hashTable, char * name )
 { int h = hash(name);
   BucketList l =  hashTable[h];
   while ((l != NULL) && (strcmp(name,l->name) != 0))
     l = l->next;
-  if (l == NULL) return -1;
-  else return l->memloc;
+  if (l == NULL) return NULL;
+  else return l;
 }
 
+BucketList find_symbol ( char * name, char * scpname )
+{ ScopeList s = scp_lookup(scpname);
+  while (s != NULL) {
+    BucketList l = st_lookup(s->hashTable, name);
+    if (l != NULL)
+      return l;
+    s = s->parent;
+  }
+  return NULL;
+}
+
+/* Procedure printFunctionList prints a formatted 
+ * listing of the function list contents 
+ * to the specified output file.
+ */
+void printFuncList(FILE * listing)
+{ FunctionList f = fl;
+  fprintf(listing,"\n< Functions >\n");
+  fprintf(listing, "Function Name   Return Type     Param Number    Param Types\n");
+  fprintf(listing, "--------------  --------------  --------------  --------------\n");
+  while (f != NULL) {
+    fprintf(listing, "%-14s  ", f->name);
+    fprintf(listing, "%-14s  ", f->type);
+    fprintf(listing, "%-11d  ", f->numParams);
+    ParamList p = f->params;
+    while (p != NULL)
+    { fprintf(listing,"%6s ",p->type);
+      p = p->next;
+    }
+    fprintf(listing, "\n");
+    f = f->next;
+  }
+  fprintf(listing,"\n");
+}
+
+/* Procedure printScpList prints a formatted 
+ * listing of the scope list contents 
+ * to the specified output file. 
+ */
 void printScpList(FILE * listing)
-{ 
-  ScopeList s = scopeList;
-  fprintf(listing,"< Scopes >\n");
-  fprintf(listing, "Scope Name       Parent Scope \n");
-  fprintf(listing, "---------------  ---------------\n");
+{ ScopeList s = sl;
+  fprintf(listing,"\n< Scopes >\n");
+  fprintf(listing, "Scope Name      Parent Scope\n");
+  fprintf(listing, "--------------  --------------\n");
   while (s != NULL) {
     fprintf(listing, "%-14s  ", s->name);
     if (s->parent != NULL)          
@@ -187,6 +241,7 @@ void printScpList(FILE * listing)
     else
       fprintf(listing, "%-14s  ", "NULL");
     s = s->next;
+    fprintf(listing, "\n");
   }
   fprintf(listing,"\n");
 }
@@ -196,20 +251,20 @@ void printScpList(FILE * listing)
  * to the listing file
  */
 void printSymTab(FILE * listing)
-{ ScopeList s = scopeList;
-  fprintf(listing,"< Symbol Table >\n");
-  fprintf(listing, "Symbol Name       Symbol Kind       Symbol Type      Scope Name       Location    Line Numbers\n");
-  fprintf(listing, "----------------  ----------------  ---------------  ---------------  ----------  -----------------\n");
+{ ScopeList s = sl;
+  fprintf(listing,"\n< Symbol Table >\n");
+  fprintf(listing, "Symbol Name     Symbol Kind     Symbol Type     Scope Name      Location    Line Numbers\n");
+  fprintf(listing, "--------------  --------------  --------------  --------------  ----------  -----------------\n");
   while (s != NULL) {
     int i;
-    for (i=0;i<SIZE;++i)
+    for (i=0;i<TABLESIZE;++i)
     { if (s->hashTable[i] != NULL)
       { BucketList l = s->hashTable[i];
         while (l != NULL)
         { LineList t = l->lines;
-          fprintf(listing, "%-16s  ", l->name);
-          fprintf(listing, "%-16s  ", l->kind);
-          fprintf(listing, "%-16s  ", l->type);
+          fprintf(listing, "%-14s  ", l->name);
+          fprintf(listing, "%-14s  ", l->kind);
+          fprintf(listing, "%-14s  ", l->type);
           fprintf(listing, "%-14s  ", l->scpname);
           fprintf(listing, "%-9d  ", l->memloc);
           while (t != NULL)

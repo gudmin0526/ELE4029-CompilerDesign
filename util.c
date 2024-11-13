@@ -82,6 +82,7 @@ TreeNode * newStmtNode(StmtKind kind)
     t->nodekind = StmtK;
     t->kind.stmt = kind;
     t->lineno = lineno;
+    t->vartype = NULL;
     t->isChildOfFunDecl = 0;
   }
   return t;
@@ -102,6 +103,7 @@ TreeNode * newExpNode(ExpKind kind)
     t->nodekind = ExpK;
     t->kind.exp = kind;
     t->lineno = lineno;
+    t->vartype = NULL;
     t->type = Void;
   }
   return t;

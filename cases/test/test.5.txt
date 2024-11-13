@@ -1,39 +1,10 @@
-int x(int y)
+int main (void)
 {
-    return y + 1;
-    {
-      int a;
-      int b;
-      int c;
-      a = 1;
-      b = 2;
-    }
-    {
-      int a;
-      int b;
-      int c;
-    }
-    {
-      int a;
-      int b;
-      int c;
-    }
-    {
-      int a;
-      int b;
-      int c;
-    }
-}
+  int x;
+  int y[5];
+  int z;
 
-int main(void)
-{
-    int a;
-    int b;
-    int c;
-    {
-      int a;
-      int b;
-      int c;
-    }
-    return x(a, b, c);
+  z = x + y;
+
+  return 0;
 }

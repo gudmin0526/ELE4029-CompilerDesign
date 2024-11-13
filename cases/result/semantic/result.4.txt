@@ -2,19 +2,27 @@
 C-MINUS COMPILATION: cases/test/test.4.txt
 
 Building Symbol Table...
+< Functions >
+Function Name   Return Type     Param Number
+--------------  --------------  --------------
+input           int             0               
+output          void            1               
+main            int             0               
+
 < Scopes >
-Scope Name       Symbol Type      Scope Name       Location    Line Numbers
----------------  ---------------  ---------------  ----------  -----------------
-global          
-main            
-x               
+Scope Name      Parent Scope
+--------------  --------------
+global          NULL            
+main            global          
+x               main            
 
 < Symbol Table >
-Symbol Name       Symbol Kind       Symbol Type      Scope Name       Location    Line Numbers
-----------------  ----------------  ---------------  ---------------  ----------  -----------------
-main              Function          int               global          0             1 
-x                 Variable          int[]             main            1             3    4 
-output            Function          undetermined      main            2             4 
+Symbol Name     Symbol Kind     Symbol Type     Scope Name      Location    Line Numbers
+--------------  --------------  --------------  --------------  ----------  -----------------
+input           Function        int             global          0             0 
+output          Function        void            global          1             0    4 
+main            Function        int             global          2             1 
+x               Variable        int[]           main            3             3    4 
 
 Checking Types...
 Type error at line 4: assignment of non-integer value

@@ -36,7 +36,9 @@ static int yylex(void); // added 11/2/11 to ensure no conflict with lex
 
 %% /* Grammar for C-MINUS */
 
-program             : declaration_list { savedTree = $1; strcpy(savedTree->scpname, "global"); } 
+program             : declaration_list 
+                        { savedTree = $1; 
+                          strcpy(savedTree->scpname, "global"); } 
                     ;
 declaration_list    : declaration_list declaration
                         { YYSTYPE t = $1;
@@ -61,7 +63,7 @@ var_declaration     : type_specifier identifier SEMI
                         { $$ = newStmtNode(VarDeclK);
                           $$->lineno = $2->lineno;
                           
-                          if (!strcmp($1->vartype, "void"))
+                          if ($1->type == Void)
                             $$->type = VoidArray;
                           else
                             $$->type = IntegerArray;
@@ -87,7 +89,8 @@ fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_st
 params              : param_list { $$ = $1; }
                     | void { $$ = newExpNode(ParamK);
                              $$->lineno = lineno;
-                             $$->vartype=NULL; }
+                             $$->type = Void;
+                             $$->vartype = NULL; }
                     ;
 param_list          : param_list COMMA param
                         { YYSTYPE t = $1;
@@ -109,7 +112,7 @@ param               : type_specifier identifier
                         { $$ = newExpNode(ParamK);
                           $$->lineno = $2->lineno;  
 
-                          if (!strcmp($1->vartype, "void"))
+                          if ($1->type == Void)
                             $$->type = VoidArray;
                           else
                             $$->type = IntegerArray;
@@ -121,6 +124,7 @@ param               : type_specifier identifier
 compound_stmt       : LCURLY local_declarations statement_list RCURLY
                         { $$ = newStmtNode(CmpdK); 
                           $$->lineno = lineno;
+                          $$->type = Void;
                           $$->child[0] = $2;
                           $$->child[1] = $3; }
                     ;
@@ -156,11 +160,14 @@ expression_stmt     : expression SEMI { $$ = $1; }
 selection_stmt      : IF LPAREN expression RPAREN statement %prec LOWER_THAN_ELSE
                         { $$ = newStmtNode(IfK);                             
                           $$->lineno = lineno;
+                          $$->type = Void;
                           $$->child[0] = $3;
                           $$->child[1] = $5; }
                     | IF LPAREN expression RPAREN statement ELSE statement
                         { $$ = newStmtNode(IfElseK);
-                          $$->lineno = lineno;                        
+                          $$->lineno = lineno;
+                          if ($5->type == $7->type)
+                            $$->type = $5->type;                        
                           $$->child[0] = $3;
                           $$->child[1] = $5;
                           $$->child[2] = $7; }
@@ -169,14 +176,17 @@ iteration_stmt      : WHILE LPAREN expression RPAREN statement
                         { $$ = newStmtNode(WhileK);
                           $$->lineno = lineno;
                           $$->child[0] = $3;
+                          $$->type = Void;
                           $$->child[1] = $5; }
                     ;
 return_stmt         : RETURN SEMI 
-                        { $$ = newStmtNode(ReturnK); 
+                        { $$ = newStmtNode(ReturnK);
+                          $$->type = Void; 
                           $$->lineno = lineno; }
                     | RETURN expression SEMI
                         { $$ = newStmtNode(ReturnK); 
                           $$->lineno = lineno;
+                          $$->type = $2->type;
                           $$->child[0] = $2; }
                     ;
 expression          : var assignop expression 
@@ -184,16 +194,24 @@ expression          : var assignop expression
                           $$->lineno = lineno;
                           $$->child[0] = $1;
                           $$->child[1] = $3;
+                          if ($1->type == IntegerArray && $3->type == IntegerArray)
+                            $$->type = IntegerArray;
+                          else if ($1->type == Integer && $3->type == Integer)
+                            $$->type = Integer;
+                          else
+                            $$->type = Void;
                           $$->attr.op = $2->attr.op; }
                     | simple_expression { $$ = $1; }
                     ;
 var                 : identifier 
                         { $$ = newExpNode(VarK);
                           $$->lineno = $1->lineno;
+                          $$->type = Integer;
                           $$->attr.name = $1->attr.name; }
                     | identifier LBRACE expression RBRACE
                         { $$ = newExpNode(VarK);
                           $$->lineno = $1->lineno;
+                          $$->type = IntegerArray;
                           $$->attr.name = $1->attr.name;
                           $$->child[0] = $3; }
                     ;
@@ -202,6 +220,10 @@ simple_expression   : additive_expression relop additive_expression
                           $$->lineno = lineno;
                           $$->child[0] = $1;
                           $$->child[1] = $3;
+                          if ($1->type == Integer && $3->type == Integer)
+                            $$->type = Integer;
+                          else
+                            $$->type = Void;
                           $$->attr.op = $2->attr.op; }
                     | additive_expression { $$ = $1; }
                     ;
@@ -232,6 +254,10 @@ additive_expression : additive_expression addop term
                           $$->lineno = lineno;                    
                           $$->child[0] = $1;
                           $$->child[1] = $3;
+                          if ($1->type == Integer && $3->type == Integer)
+                            $$->type = Integer;
+                          else
+                            $$->type = Void;
                           $$->attr.op = $2->attr.op; }
                     | term { $$ = $1; }
                     ;
@@ -286,6 +312,7 @@ identifier          : ID { $$ = newExpNode(IdK);
                     ;
 number              : NUM { $$ = newExpNode(ConstK);
                             $$->attr.val = atoi(tokenString);
+                            $$->type = Integer;
                             $$->lineno = lineno; }
                     ;
 int                 : INT { $$ = newExpNode(TypeK); 
