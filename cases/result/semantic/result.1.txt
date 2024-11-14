@@ -2,42 +2,39 @@
 C-MINUS COMPILATION: cases/test/test.1.txt
 
 Building Symbol Table...
+
 < Functions >
-Function Name   Return Type     Param Number
---------------  --------------  --------------
-input           int             0               
-output          void            1               
-gcd             int             2               
-main            void            0               
+Function Name   Return Type     Param Number    Param Types
+--------------  --------------  --------------  --------------
+input           int             0             
+output          void            1               int 
+gcd             int             2               int   int 
+main            void            0             
+
 
 < Scopes >
 Scope Name      Parent Scope
 --------------  --------------
 global          NULL            
+input           global          
+output          global          
 gcd             global          
 main            global          
+
 
 < Symbol Table >
 Symbol Name     Symbol Kind     Symbol Type     Scope Name      Location    Line Numbers
 --------------  --------------  --------------  --------------  ----------  -----------------
 input           Function        int             global          0             0   14   14 
 output          Function        void            global          1             0   15 
-gcd             Function        int             global          2             4    7   15 
-main            Function        void            global          5            11 
-u               Variable        int             gcd             3             4    6    7    7 
-v               Variable        int             gcd             4             4    6    7    7    7 
-x               Variable        int             main            6            13   14   15 
-y               Variable        int             main            7            13   14   15 
+gcd             Function        int             global          3             4    7   15 
+main            Function        void            global          6            11 
+value           Variable        int             output          2             0 
+u               Variable        int             gcd             4             4    6    7    7 
+v               Variable        int             gcd             5             4    6    7    7    7 
+x               Variable        int             main            7            13   14   15 
+y               Variable        int             main            8            13   14   15 
 
 Checking Types...
-Type error at line 6: Op applied to non-integer
-Type error at line 6: assignment of non-integer value
-Type error at line 7: Op applied to non-integer
-Type error at line 7: Op applied to non-integer
-Type error at line 7: Op applied to non-integer
-Type error at line 7: assignment of non-integer value
-Type error at line 6: assignment of non-integer value
-Type error at line 14: assignment of non-integer value
-Type error at line 14: assignment of non-integer value
 
 Type Checking Finished

@@ -83,6 +83,7 @@ TreeNode * newStmtNode(StmtKind kind)
     t->kind.stmt = kind;
     t->lineno = lineno;
     t->vartype = NULL;
+    t->type = Void;
     t->isChildOfFunDecl = 0;
   }
   return t;

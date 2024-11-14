@@ -2,29 +2,35 @@
 C-MINUS COMPILATION: cases/test/test.4.txt
 
 Building Symbol Table...
+
 < Functions >
-Function Name   Return Type     Param Number
---------------  --------------  --------------
-input           int             0               
-output          void            1               
-main            int             0               
+Function Name   Return Type     Param Number    Param Types
+--------------  --------------  --------------  --------------
+input           int             0             
+output          void            1               int 
+main            int             0             
+
 
 < Scopes >
 Scope Name      Parent Scope
 --------------  --------------
 global          NULL            
+input           global          
+output          global          
 main            global          
-x               main            
+
 
 < Symbol Table >
 Symbol Name     Symbol Kind     Symbol Type     Scope Name      Location    Line Numbers
 --------------  --------------  --------------  --------------  ----------  -----------------
 input           Function        int             global          0             0 
 output          Function        void            global          1             0    4 
-main            Function        int             global          2             1 
-x               Variable        int[]           main            3             3    4 
+main            Function        int             global          3             1 
+value           Variable        int             output          2             0 
+x               Variable        int[]           main            4             3    4 
 
 Checking Types...
-Type error at line 4: assignment of non-integer value
+Error: Invalid array indexing at line 4 (name : "x"). indicies should be integer
+Error: invalid assignment at line 4
 
 Type Checking Finished
