@@ -57,18 +57,22 @@ var_declaration     : type_specifier identifier SEMI
                         { $$ = newStmtNode(VarDeclK);
                           $$->lineno = $2->lineno;  
                           $$->vartype = $1->vartype;
-                          $$->type = $1->type;
+
+                          $$->type = Void;
+                          $2->type = $1->type;
+
                           $$->attr.name = $2->attr.name; }
                     | type_specifier identifier LBRACE number RBRACE SEMI
                         { $$ = newStmtNode(VarDeclK);
                           $$->lineno = $2->lineno;
                           
+                          $$->type = Void;
                           if ($1->type == Void)
-                            $$->type = VoidArray;
+                            $2->type = VoidArray;
                           else if ($1->type == Integer)
-                            $$->type = IntegerArray;
+                            $2->type = IntegerArray; 
                           else
-                            $$->type = Undetermined;
+                            $2->type = Undetermined;
         
                           strcat($1->vartype, "[]");                            
                           $$->vartype = $1->vartype;        
@@ -82,7 +86,10 @@ fun_declaration     : type_specifier identifier LPAREN params RPAREN compound_st
                         { $$ = newStmtNode(FunDeclK);
                           $$->lineno = $2->lineno;  
                           $$->vartype = $1->vartype;
-                          $$->type = $1->type;
+
+                          $$->type = Void;
+                          $2->type = $1->type;
+
                           $$->attr.name = $2->attr.name;
                           $$->child[0] = $4;
                           $$->child[1] = $6;
@@ -108,18 +115,22 @@ param               : type_specifier identifier
                         { $$ = newExpNode(ParamK);
                           $$->lineno = $2->lineno;   
                           $$->vartype = $1->vartype;
-                          $$->type = $1->type;
+
+                          $2->type = $1->type;
+                          $$->type = $2->type;
+
                           $$->attr.name = $2->attr.name; }
                     | type_specifier identifier LBRACE RBRACE
                         { $$ = newExpNode(ParamK);
                           $$->lineno = $2->lineno;  
 
                           if ($1->type == Void)
-                            $$->type = VoidArray;
+                            $2->type = VoidArray;
                           else if ($1->type == Integer)
-                            $$->type = IntegerArray;
+                            $2->type = IntegerArray;
                           else
-                            $$->type = Undetermined;
+                            $2->type = Undetermined;
+                          $$->type = $2->type;
 
                           strcat($1->vartype, "[]");
                           $$->vartype = $1->vartype;

@@ -1,0 +1,14 @@
+int main (void)
+{
+  int x;
+  int y[3];
+
+  x + y;     /* 8. int + int[] -> invalid */
+  x + y[0];  /* 8. int + int   -> valid */
+  x < y;     /* 8. invalid */
+  x < y[0];  /* 8. valid   */
+  x == y;    /* 8. invalid */
+  x == y[0]; /* 8. valid   */
+  
+  return;    /* 11. invalid return */
+}

@@ -89,9 +89,10 @@ static void checkScope(TreeNode * t, int nthChild)
         case IfK:
         case IfElseK:
         case WhileK:
+          nthChild++;
         case ReturnK:
         case AssignK:
-          while (j < MAXCHILDREN) {
+        { while (j < MAXCHILDREN) {
             if (t->child[j] != NULL) {
               strcpy(t->child[j]->scpname, t->scpname);
               t->child[j]->parent = t;
@@ -102,10 +103,10 @@ static void checkScope(TreeNode * t, int nthChild)
             strcpy(t->sibling->scpname, t->scpname);
             t->sibling->parent = t->parent;
           }
-          nthChild = 0;         
           break;
+        }
         case VarDeclK:
-          while (j < MAXCHILDREN) {
+        { while (j < MAXCHILDREN) {
             if (t->child[j] != NULL) {
               strcpy(t->child[j]->scpname, t->scpname);
               t->child[j]->parent = t;
@@ -116,10 +117,10 @@ static void checkScope(TreeNode * t, int nthChild)
             strcpy(t->sibling->scpname, t->scpname);
             t->sibling->parent = t->parent;
           }
-          nthChild = 0;
           break;
-        case FunDeclK:          
-          while (j < MAXCHILDREN) {
+        }
+        case FunDeclK:
+        { while (j < MAXCHILDREN) {
             if (t->child[j] != NULL) {
               strcpy(t->child[j]->scpname, t->attr.name);
               t->child[j]->parent = t;
@@ -130,9 +131,11 @@ static void checkScope(TreeNode * t, int nthChild)
             strcpy(t->sibling->scpname, t->scpname);
             t->sibling->parent = t->parent;
           }
-          nthChild = 0;
           break;
+        }
         case CmpdK:
+        { if (t->parent->kind.stmt != CmpdK)
+            nthChild--;
           char scpname[MAXLENSCPNAME];
           strcpy(scpname, t->scpname);
           if (!t->isChildOfFunDecl) { /* funDecl에 속한 compound_stmt가 아닐 경우 */
@@ -150,9 +153,10 @@ static void checkScope(TreeNode * t, int nthChild)
           if (t->sibling != NULL) {
             strcpy(t->sibling->scpname, t->scpname);
             t->sibling->parent = t->parent;
-            nthChild++;
           }
+          nthChild++;
           break;
+        }
         default:
           break;
       }
@@ -177,14 +181,14 @@ static void checkScope(TreeNode * t, int nthChild)
             strcpy(t->sibling->scpname, t->scpname);
             t->sibling->parent = t->parent;
           }
-          nthChild = 0;
           break;        
         default:
           break;
       }
     }
-    for (i=0;i<MAXCHILDREN;i++)
+    for (i=0;i<MAXCHILDREN;i++) {
       checkScope(t->child[i], nthChild);
+    }
     t = t->sibling;
   }
 } 
@@ -326,32 +330,30 @@ void buildSymtab(TreeNode * syntaxTree)
  * type is integer. if not, return 0 
  */
 static int isTypeInteger(TreeNode * t) 
-{ if (t->kind.exp == ConstK) 
+{ if (t->type == Integer)
+  return 1;
+
+  if (t->kind.exp == ConstK) 
     return t->type == Integer;
   else if (t->kind.exp == VarK || t->kind.exp == CallK) {
-    BucketList bl = find_symbol(t->attr.name, t->scpname); /* symtab에 존재하는지 확인 */
-    return bl && strcmp(bl->type, "int") == 0;
-  } else {
-    if (t->type == Integer)
-      return 1;
-    return 0;
+    BucketList bl = find_symbol(t->attr.name, t->scpname);
+    return bl && !strcmp(bl->type, "int");
   }
-  return -1;
+  return 0;
 }
 
 /* Function isTypeIntegerArray checks if symbol's 
  * type is integer array. if not, return 0 
  */
 static int isTypeIntegerArray(TreeNode * t) 
-{ if (t->kind.exp == VarK || t->kind.exp == CallK) {
+{ if (t->type == IntegerArray)
+    return 1;
+    
+  if (t->kind.exp == VarK || t->kind.exp == CallK) {
     BucketList bl = find_symbol(t->attr.name, t->scpname); /* symtab에 존재하는지 확인 */
-    return bl && strcmp(bl->type, "int[]") == 0;
-  } else {
-    if (t->type == IntegerArray)
-      return 1;
-    return 0;
+    return bl && !strcmp(bl->type, "int[]");
   }
-  return -1;
+  return 0;
 }
 
 /* Function isTypeVoidKind checks if
@@ -364,9 +366,8 @@ static int isTypeVoidKind(TreeNode * t)
   else {
     if (t->type == Void || t->type == VoidArray)
       return 1;
-    return 0;
   }
-  return -1;
+  return 0;
 }
 
 /* Procedure checkNode performs
@@ -379,11 +380,11 @@ static void checkNode(TreeNode * t)
       case OpK:
         { TreeNode * c0 = t->child[0];
           TreeNode * c1 = t->child[1];
-          if (!isTypeInteger(c0) || !isTypeInteger(c1))
-            fprintf(listing, "Error: invalid operation at line %d\n", c0->lineno);   
+          if (c0->type != Integer || c1->type != Integer) {
+            fprintf(listing, "Error: invalid operation at line %d\n", c0->lineno);
+            t->type = Undetermined;
+          }   
           else {
-            c0->type = Integer;
-            c1->type = Integer;
             t->type = Integer;
           }
           break;
@@ -393,6 +394,7 @@ static void checkNode(TreeNode * t)
             break;
           if (isTypeVoidKind(t)) { /* void type variable -> Error */
             fprintf(listing, "Error: The void-type variable is declared at line %d (name : \"%s\")\n", t->lineno, t->attr.name);
+            t->type = Void;
             break;
           }
           break;
@@ -400,22 +402,38 @@ static void checkNode(TreeNode * t)
         case VarK:
         { if (isTypeVoidKind(t)) { /* void type variable -> Error */
             fprintf(listing, "Error: The void-type variable is declared at line %d (name : \"%s\")\n", t->lineno, t->attr.name);
+            t->type = Void;
             break;
           }
-          if (isTypeIntegerArray(t) && t->child[0] != NULL && !isTypeInteger(t->child[0])) 
-            fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indicies should be integer\n", t->lineno, t->attr.name);
-          else if (!isTypeIntegerArray(t) && t->child[0] != NULL) /* array가 아닌데 자식이 있으면 안된다 */
+
+          printf("VarK# name: %s, type: %d, lineno: %d, hasChild: %d\n", t->attr.name, t->type, t->lineno, t->child[0] != NULL);
+
+          if (isTypeInteger(t) && t->child[0] != NULL) { /* 1. Integer has child -> Error */
             fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indexing can only allowed for int[] variables\n", t->lineno, t->attr.name);    
+            t->type = Undetermined;
+          } else if (isTypeInteger(t) && t->child[0] == NULL) { /* 2. Integer has no child -> Normal */
+            t->type = Integer;
+          } else if (isTypeIntegerArray(t) && t->child[0] != NULL && isTypeInteger(t->child[0])) { /* 3. Array has child and child is integer -> Integer */
+            t->type = Integer;
+          } else if (isTypeIntegerArray(t) && t->child[0] != NULL && !isTypeInteger(t->child[0])) { /* 4. Array has child but child is not integer -> Error */
+            fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indicies should be integer\n", t->lineno, t->attr.name);
+            t->type = Undetermined;
+          } else if (isTypeIntegerArray(t) && t->child[0] == NULL) { /* 4. Array has no child -> Integer Array */
+            t->type = IntegerArray;
+          } 
           break;
         }
         case CallK:
-        { BucketList bl = find_symbol(t->attr.name, t->scpname);
+        { BucketList bl = find_symbol(t->attr.name, t->scpname); 
           if (bl == NULL) {/* symbol table에 존재하는지 확인 */
-            fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+            fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name);
+            t->type = Undetermined; 
             break;
           }
+
           if (!strcmp(bl->type, "undetermined")) { /* invalid function call */
             fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+            t->type = Undetermined;
             break;
           }
 
@@ -427,18 +445,30 @@ static void checkNode(TreeNode * t)
           while (c != NULL) {
             if (p == NULL) { /* params와 args의 길이가 안맞는 경우 */
               fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+              t->type = Undetermined;
               return;
             }
-            if (!((isTypeInteger(c) && !strcmp(p->type, "int")) || (isTypeIntegerArray(c) && !strcmp(p->type, "int")))) {
+            if (!((c->type == Integer && !strcmp(p->type, "int")) || (c->type == IntegerArray && !strcmp(p->type, "int[]")))) {
               fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+              t->type = Undetermined;
               return;
             } /* params와 args의 타입이 불일치하는 경우 or Void 타입을 가진 경우 */
             numArgs++;
             p = p->next;
             c = c->sibling;
           }
-          if (numArgs != fl->numParams) 
+          if (numArgs != fl->numParams) {
             fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
+            t->type = Undetermined;
+          }
+          if (!strcmp(fl->type, "int"))
+            t->type = Integer;
+          else
+            t->type = Void;
+          break;
+        }
+        case ConstK:
+        { t->type = Integer;
           break;
         }
         default:
@@ -451,10 +481,12 @@ static void checkNode(TreeNode * t)
         case IfElseK:
         case WhileK:
         { TreeNode * c = t->child[0];
-          if (c == NULL || !isTypeInteger(c)) {
-            fprintf(listing, "Error: invalid condition at line %d\n", t->lineno);
+          if (c == NULL || c->type != Integer) {
+            fprintf(listing, "Error: invalid condition at line %d\n", c->lineno);
+            t->type = Undetermined;
             break;
           }
+          t->type = Void;
           break;
         }
         case ReturnK:
@@ -465,11 +497,17 @@ static void checkNode(TreeNode * t)
 
           if (c == NULL && strcmp(fl->type, "void") != 0) {  
             fprintf(listing, "Error: Invalid return at line %d\n", t->lineno);
+            t->type = Undetermined;
             break;
-          } else if (c != NULL && (!isTypeInteger(c) || strcmp(fl->type, "int") != 0)) {
+          } else if (c != NULL && (c->type != Integer || strcmp(fl->type, "int") != 0)) {
             fprintf(listing, "Error: Invalid return at line %d\n", t->lineno);
+            t->type = Undetermined;
             break;
           }
+          if (c == NULL)
+            t->type = Void;
+          else
+            t->type = Integer;
           break;
         }
         case AssignK:
@@ -477,13 +515,25 @@ static void checkNode(TreeNode * t)
           TreeNode * c1 = t->child[1];
           if (c0 == NULL || c1 == NULL) {
             fprintf(listing, "Error: invalid assignment at line %d\n", t->lineno);
+            t->type = Undetermined;
             break;
           }
-          if (!((isTypeInteger(c0) && isTypeInteger(c1)) || (isTypeIntegerArray(c0) && isTypeIntegerArray(c1)))) {
+          if (c0->type == Integer && c1->type == Integer) {
+            t->type = Integer;
+          } else if (c0->type == IntegerArray && c1->type == IntegerArray) {
+            t->type = IntegerArray;
+          } else {
             fprintf(listing, "Error: invalid assignment at line %d\n", t->lineno);
+            t->type = Undetermined;
             break;
           }
           break;
+        }
+        case VarDeclK:
+        case FunDeclK:
+        case CmpdK: 
+        { t->type = Void;
+          break;  
         }
         default:
           break;

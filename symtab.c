@@ -213,10 +213,10 @@ void printFuncList(FILE * listing)
   while (f != NULL) {
     fprintf(listing, "%-14s  ", f->name);
     fprintf(listing, "%-14s  ", f->type);
-    fprintf(listing, "%-11d  ", f->numParams);
+    fprintf(listing, "%-12d  ", f->numParams);
     ParamList p = f->params;
     while (p != NULL)
-    { fprintf(listing,"%6s ",p->type);
+    { fprintf(listing,"%5s ",p->type);
       p = p->next;
     }
     fprintf(listing, "\n");

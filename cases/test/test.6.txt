@@ -1,0 +1,45 @@
+int main(void)
+{
+  int c;
+  {
+    x; /* 5. nesting scope and undefined variable -> invalid*/
+  }
+  x; /* 5. nesting scope and undefined variable -> invalid */
+  {
+    int c; /* 6. nesting scope and redefined variable -> valid */
+    {
+      x; /* 6-1. nesting scope and defined variable usage -> valid */
+      input(); /* 7. input function in nesting scope -> valid */  
+      output(1); /* 7. output function in nesting scope -> valid */
+      output(1, 2); /* 10. argument and parameter matching -> invalid */
+    }
+  }
+
+  /* 17. return type is int but has no return statement -> invalid */
+}
+
+int dummy1(void) {}
+void dummy2(void) {}
+
+int main1(void)
+{
+  int x; int y[5]; int z; int k[3];
+  if (x) {}            /* 9. int condition -> O */
+  if (y) {}            /* 9. int[] condition -> X */
+  if (y[1]) {}         /* 9. int condition -> O */
+  if (x < y) {}        /* 9. int < int[] -> X */
+  if (x < y[1]) {}     /* 9. int < int -> O */
+  if (x = y) {}        /* 9. int = int[] -> X */
+  if (x = y[1]) {}     /* 9. int = int -> O */
+  if (z = x + y) {}    /* 9. int = int + int[] -> X */
+  if (z = x + y[1]) {} /* 9. int = int + int -> O */
+  if (k = z) {}        /* 9. int[] = int[] -> X */
+  if (k = z[1]) {}     /* 9. int[] = int -> X */
+  if (k[1] = z[1]) {}  /* 9. int = int -> O */
+  if (dummy1()) {}       /* 9. int -> O */
+  if (dummy2()) {        /* 9. void -> X */
+
+
+  } /* 14. check line number for statement */
+
+ }

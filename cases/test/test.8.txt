@@ -1,0 +1,19 @@
+int main (void) {
+  int x; int y[5]; int z; int k[3];
+  z[1]; /* 12. array indexing problem */
+  x = y;
+  x = y[1];
+  z = x + y;
+  z = x + y[1];
+  z = x[1] + y;
+  z = x[1] + y[1];
+  k[1] = z[1];
+  k = z;
+  k = z[1];
+  k[1] = z;
+  
+  if (x = y) {}        /* 9. int = int[] -> X */
+  if (x = y[1]) {}     /* 9. int = int -> O */
+  if (z = x + y[1]) {} /* 9. int = int + int -> O */
+  if (k[1] = z[1]) {}  /* 9. int = int -> O */
+}
