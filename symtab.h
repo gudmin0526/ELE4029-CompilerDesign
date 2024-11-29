@@ -84,7 +84,7 @@ void sl_fl_init();
  */
 void scp_insert( char * name, char * parent );
 
-/* Function sp_lookup returns l
+/* Function scp_lookup returns l
  * or NULL if scope name not found
  */
 ScopeList scp_lookup ( char * name );
@@ -110,7 +110,6 @@ void st_insert( BucketList * hashTable, char * name, char * type, char * kind,  
  * or NULL if not found
  */
 BucketList st_lookup ( BucketList * hashTable, char * name );
-
 BucketList find_symbol ( char * name, char * scpname );
 
 /* Procedure printSymTab prints a formatted 
