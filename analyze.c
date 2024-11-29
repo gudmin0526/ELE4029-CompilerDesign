@@ -406,18 +406,16 @@ static void checkNode(TreeNode * t)
             break;
           }
 
-          printf("VarK# name: %s, type: %d, lineno: %d, hasChild: %d\n", t->attr.name, t->type, t->lineno, t->child[0] != NULL);
-
           if (isTypeInteger(t) && t->child[0] != NULL) { /* 1. Integer has child -> Error */
             fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indexing can only allowed for int[] variables\n", t->lineno, t->attr.name);    
-            t->type = Undetermined;
+            t->type = Integer;
           } else if (isTypeInteger(t) && t->child[0] == NULL) { /* 2. Integer has no child -> Normal */
             t->type = Integer;
           } else if (isTypeIntegerArray(t) && t->child[0] != NULL && isTypeInteger(t->child[0])) { /* 3. Array has child and child is integer -> Integer */
             t->type = Integer;
           } else if (isTypeIntegerArray(t) && t->child[0] != NULL && !isTypeInteger(t->child[0])) { /* 4. Array has child but child is not integer -> Error */
             fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indicies should be integer\n", t->lineno, t->attr.name);
-            t->type = Undetermined;
+            t->type = Integer;
           } else if (isTypeIntegerArray(t) && t->child[0] == NULL) { /* 4. Array has no child -> Integer Array */
             t->type = IntegerArray;
           } 
@@ -445,12 +443,12 @@ static void checkNode(TreeNode * t)
           while (c != NULL) {
             if (p == NULL) { /* params와 args의 길이가 안맞는 경우 */
               fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
-              t->type = Undetermined;
+              t->type = Integer;
               return;
             }
             if (!((c->type == Integer && !strcmp(p->type, "int")) || (c->type == IntegerArray && !strcmp(p->type, "int[]")))) {
               fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
-              t->type = Undetermined;
+              t->type = Integer;
               return;
             } /* params와 args의 타입이 불일치하는 경우 or Void 타입을 가진 경우 */
             numArgs++;
@@ -459,7 +457,7 @@ static void checkNode(TreeNode * t)
           }
           if (numArgs != fl->numParams) {
             fprintf(listing, "Error: Invalid function call at line %d (name : \"%s\")\n", t->lineno, t->attr.name); 
-            t->type = Undetermined;
+            t->type = Integer;
           }
           if (!strcmp(fl->type, "int"))
             t->type = Integer;

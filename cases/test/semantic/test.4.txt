@@ -1,0 +1,7 @@
+int main(void)
+{
+    int x[5];
+    x[output(5)] = 3 + 5; /* 왼쪽은 undetermined 고 오른쪽은 int */
+    /* int인데 return이 없는 경우 */
+    return 0;
+}

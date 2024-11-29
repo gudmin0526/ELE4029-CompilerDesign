@@ -1,37 +1,9 @@
 
 C-MINUS COMPILATION: cases/test/test.5.txt
-
-Building Symbol Table...
-
-< Functions >
-Function Name   Return Type     Param Number    Param Types
---------------  --------------  --------------  --------------
-input           int             0             
-output          void            1               int 
-main            int             0             
-
-
-< Scopes >
-Scope Name      Parent Scope
---------------  --------------
-global          NULL            
-input           global          
-output          global          
-main            global          
-
-
-< Symbol Table >
-Symbol Name     Symbol Kind     Symbol Type     Scope Name      Location    Line Numbers
---------------  --------------  --------------  --------------  ----------  -----------------
-input           Function        int             global          0             0 
-output          Function        void            global          1             0 
-main            Function        int             global          3             1 
-value           Variable        int             output          2             0 
-x               Variable        int             main            4             3    6 
-y               Variable        int[]           main            5             4    6 
-
-Checking Types...
-Error: invalid operation at line 6
-Error: invalid condition at line 6
-
-Type Checking Finished
+Error: undeclared function "y" is used at line 3
+Error: undeclared variable "x" is used at line 4
+Error: Symbol "a" is redefined at line 10 (already defined at line 9)
+Error: undeclared variable "b" is used at line 12
+Error: Symbol "main" is redefined at line 16 (already defined at line 1)
+Error: Invalid function call at line 3 (name : "y")
+Error: Invalid return at line 4

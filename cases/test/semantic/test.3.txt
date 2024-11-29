@@ -9,5 +9,5 @@ int main(void)
     int b;
     int c;
 
-    return x(a, b, c);
+    return x(a, b, c); /* 이 call 자체는 undetermined */
 }
