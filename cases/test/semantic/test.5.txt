@@ -1,17 +1,13 @@
-int main(void)
+int main0 (void)
 {
-  y(); /* 2. undeclared function usage, 10. invalid function call */
-  return x; /* 1. undeclared variable usage, 11. invalid return */
-} 
-
-void y(void)
-{
-  int a;
-  int a; /* 3. redefined variable */
-
-  b; /* 1. undeclared variable usage */
-  b;
+  int x;
+  int y[3];
+  x+y;
+  return 0;
 }
 
-void main(void) { } /* 4. redefined function */
-
+int main1 (void)
+{
+  void x;
+  return 0;
+}

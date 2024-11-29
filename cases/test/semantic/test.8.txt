@@ -1,19 +1,50 @@
-int main (void) {
-  int x; int y[5]; int z; int k[3];
-  z[1]; /* 12. array indexing problem */
-  x = y;
-  x = y[1];
+int main0 (void)
+{
+  int 
+  y;
+  int y;
+  int
+  y
+  ;
+}
+
+int main1 (void)
+{
+  int x;
+  int y[5];
+
+  x +
+  y
+  +
+  5;
+
+  return 0;
+}
+
+int main2(void) {
+  int x;
+  int y[5];
+
+  y
+  +y
+  +y;
+
+  return 0;
+}
+
+int main3(void){
+  int x;
+  int y[5];
+  while (x +
+  y)
+  {}
+}
+
+int main4 (void) {
+  int x;
+  int y[5];
+  int z;
   z = x + y;
-  z = x + y[1];
-  z = x[1] + y;
-  z = x[1] + y[1];
-  k[1] = z[1];
-  k = z;
-  k = z[1];
-  k[1] = z;
-  
-  if (x = y) {}        /* 9. int = int[] -> X */
-  if (x = y[1]) {}     /* 9. int = int -> O */
-  if (z = x + y[1]) {} /* 9. int = int + int -> O */
-  if (k[1] = z[1]) {}  /* 9. int = int -> O */
+
+  return 0;
 }

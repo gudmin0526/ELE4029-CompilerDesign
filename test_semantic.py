@@ -22,7 +22,7 @@ def main():
     print("--- SEMANTIC ANALYSIS ---")
     
     test_cases = []
-    for i in range(1, 6):
+    for i in range(1, 9):
       test_cases.append((f"cases/test/semantic/test.{i}.txt", f"cases/result/semantic/result.{i}.txt"))
     
     for idx, (input_file, output_file) in enumerate(test_cases, start=1):

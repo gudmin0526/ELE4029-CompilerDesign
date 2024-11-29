@@ -1,0 +1,12 @@
+
+C-MINUS COMPILATION: cases/test/semantic/test.8.txt
+Error: Symbol "y" is redefined at line 5 (already defined at line 4)
+Error: Symbol "y" is redefined at line 7 (already defined at line 4 5)
+Error: invalid operation at line 16
+Error: invalid operation at line 16
+Error: invalid operation at line 28
+Error: invalid operation at line 28
+Error: invalid operation at line 38
+Error: invalid condition at line 40
+Error: invalid operation at line 47
+Error: invalid assignment at line 47

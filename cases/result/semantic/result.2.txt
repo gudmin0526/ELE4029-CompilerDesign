@@ -1,2 +1,2 @@
 
-C-MINUS COMPILATION: cases/test/test.2.txt
+C-MINUS COMPILATION: cases/test/semantic/test.2.txt

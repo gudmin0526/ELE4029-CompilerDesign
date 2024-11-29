@@ -231,6 +231,7 @@ static void insertSymbol(TreeNode * t)
         }
         case VarDeclK:
         { BucketList bl = st_lookup(s->hashTable,t->attr.name);
+
           if (bl != NULL) {/* 다른 스코프에서 선언된건 알빠 아님 */
             fprintf(listing, "Error: Symbol \"%s\" is redefined at line %d (already defined at line", t->attr.name, t->lineno);
             // Program to sequentially print all the line numbers
@@ -242,8 +243,13 @@ static void insertSymbol(TreeNode * t)
             fprintf(listing, ")\n");
             st_insert(s->hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,0);
           }
-          else
+          else {
+            if (!strcmp(t->vartype, "void") || !strcmp(t->vartype, "void[]")) { /* void type variable -> Error */
+              fprintf(listing, "Error: The void-type variable is declared at line %d (name : \"%s\")\n", t->lineno, t->attr.name);
+              t->type = Undetermined;
+            }
             st_insert(s->hashTable,t->attr.name,t->vartype,"Variable",t->scpname,t->lineno,location++);
+          } 
           break;
         }
         default:
@@ -400,15 +406,9 @@ static void checkNode(TreeNode * t)
           break;
         }
         case VarK:
-        { if (isTypeVoidKind(t)) { /* void type variable -> Error */
-            fprintf(listing, "Error: The void-type variable is declared at line %d (name : \"%s\")\n", t->lineno, t->attr.name);
-            t->type = Void;
-            break;
-          }
-
-          if (isTypeInteger(t) && t->child[0] != NULL) { /* 1. Integer has child -> Error */
+        { if (isTypeInteger(t) && t->child[0] != NULL) { /* 1. Integer has child -> Error */
             fprintf(listing, "Error: Invalid array indexing at line %d (name : \"%s\"). indexing can only allowed for int[] variables\n", t->lineno, t->attr.name);    
-            t->type = Integer;
+            t->type = Undetermined;
           } else if (isTypeInteger(t) && t->child[0] == NULL) { /* 2. Integer has no child -> Normal */
             t->type = Integer;
           } else if (isTypeIntegerArray(t) && t->child[0] != NULL && isTypeInteger(t->child[0])) { /* 3. Array has child and child is integer -> Integer */
@@ -480,7 +480,7 @@ static void checkNode(TreeNode * t)
         case WhileK:
         { TreeNode * c = t->child[0];
           if (c == NULL || c->type != Integer) {
-            fprintf(listing, "Error: invalid condition at line %d\n", c->lineno);
+            fprintf(listing, "Error: invalid condition at line %d\n", t->child[1]->lineno);
             t->type = Undetermined;
             break;
           }

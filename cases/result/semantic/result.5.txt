@@ -1,9 +1,4 @@
 
-C-MINUS COMPILATION: cases/test/test.5.txt
-Error: undeclared function "y" is used at line 3
-Error: undeclared variable "x" is used at line 4
-Error: Symbol "a" is redefined at line 10 (already defined at line 9)
-Error: undeclared variable "b" is used at line 12
-Error: Symbol "main" is redefined at line 16 (already defined at line 1)
-Error: Invalid function call at line 3 (name : "y")
-Error: Invalid return at line 4
+C-MINUS COMPILATION: cases/test/semantic/test.5.txt
+Error: The void-type variable is declared at line 11 (name : "x")
+Error: invalid operation at line 5

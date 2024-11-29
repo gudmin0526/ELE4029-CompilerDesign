@@ -1,0 +1,5 @@
+
+C-MINUS COMPILATION: cases/test/semantic/test.6.txt
+Error: undeclared variable "x" is used at line 17
+Error: Invalid function call at line 12 (name : "kk")
+Error: Invalid return at line 17

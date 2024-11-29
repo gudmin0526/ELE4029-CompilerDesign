@@ -1,0 +1,12 @@
+
+C-MINUS COMPILATION: cases/test/semantic/test.7.txt
+Error: undeclared variable "x" is used at line 2
+Error: undeclared variable "x" is used at line 8
+Error: undeclared variable "x" is used at line 14
+Error: undeclared function "x" is used at line 20
+Error: invalid operation at line 9
+Error: invalid operation at line 14
+Error: invalid operation at line 15
+Error: Invalid function call at line 20 (name : "x")
+Error: Invalid function call at line 21 (name : "x")
+Error: invalid condition at line 21
